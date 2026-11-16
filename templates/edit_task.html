@@ -1,44 +1,44 @@
 {% extends 'base.html' %}
 
-{% block title %}Y2A-Auto - 编辑任务{% endblock %}
+{% block title %}Y2A-Auto - Chỉnh sửa nhiệm vụ{% endblock %}
 
 {% block content %}
 <div class="edit-task-container" data-upload-target="{{ upload_target|default('acfun') }}">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>编辑任务</h2>
-        <a href="{{ url_for('tasks') }}" class="btn btn-outline-secondary">返回任务列表</a>
+        <h2>Chỉnh sửa nhiệm vụ</h2>
+        <a href="{{ url_for('tasks') }}" class="btn btn-outline-secondary">Quay lại danh sách nhiệm vụ</a>
     </div>
     
     {% if task %}
         <div class="row">
-            <!-- 左侧信息栏 -->
+            <!-- Cột thông tin bên trái -->
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-header">
-                        任务信息
+                        Thông tin nhiệm vụ
                     </div>
                     <div class="card-body">
-                        <p><strong>任务ID:</strong> {{ task.id }}</p>
-                        <p><strong>创建时间:</strong> {{ task.created_at }}</p>
-                        <p><strong>状态:</strong> 
+                        <p><strong>ID nhiệm vụ:</strong> {{ task.id }}</p>
+                        <p><strong>Thời gian tạo:</strong> {{ task.created_at }}</p>
+                        <p><strong>Trạng thái:</strong> 
                             <span class="badge rounded-pill bg-{{ task_status_color(task.status) }} task-status-badge">
                                 {{ task_status_display(task.status) }}
                             </span>
                         </p>
-                        <p><strong>目标平台:</strong> {{ '双平台' if (upload_target|default('acfun')) == 'both' else ('bilibili' if (upload_target|default('acfun')) == 'bilibili' else 'AcFun') }}</p>
-                        <p><strong>YouTube网址:</strong> <a href="{{ task.youtube_url }}" target="_blank" rel="noopener">{{ task.youtube_url }}</a></p>
+                        <p><strong>Nền tảng đích:</strong> {{ 'Cả hai nền tảng' if (upload_target|default('acfun')) == 'both' else ('bilibili' if (upload_target|default('acfun')) == 'bilibili' else 'AcFun') }}</p>
+                        <p><strong>URL YouTube:</strong> <a href="{{ task.youtube_url }}" target="_blank" rel="noopener">{{ task.youtube_url }}</a></p>
                     </div>
                 </div>
                 
                 <div class="card mb-4">
                     <div class="card-header">
-                        视频封面
+                        Ảnh bìa video
                     </div>
                     {% if has_cover_preview %}
-                        <img src="{{ url_for('get_task_cover', task_id=task.id) }}" class="card-img-top" alt="视频封面">
+                        <img src="{{ url_for('get_task_cover', task_id=task.id) }}" class="card-img-top" alt="Ảnh bìa video">
                     {% else %}
                         <div class="card-body text-muted">
-                            当前任务暂无可预览封面。
+                            Nhiệm vụ hiện tại chưa có ảnh bìa để xem trước.
                         </div>
                     {% endif %}
                     <div class="card-body">
@@ -46,40 +46,40 @@
                             <input class="form-check-input" type="checkbox" id="cover-mode-switch" 
                                    {% if config.COVER_PROCESSING_MODE == 'crop' %}checked{% endif %}>
                             <label class="form-check-label" for="cover-mode-switch">
-                                使用裁剪模式 (当前: {{ '裁剪' if config.COVER_PROCESSING_MODE == 'crop' else '填充' }})
+                                Đang dùng chế độ cắt (hiện tại: {{ 'Cắt' if config.COVER_PROCESSING_MODE == 'crop' else 'Chèn thêm' }})
                             </label>
                         </div>
-                        <button class="btn btn-sm btn-primary mt-2" id="toggle-cover-mode">切换封面处理模式</button>
+                        <button class="btn btn-sm btn-primary mt-2" id="toggle-cover-mode">Đổi chế độ xử lý ảnh bìa</button>
 
                         <hr>
 
                         <div class="small text-muted mb-2">
-                            当前生效文件: {{ current_cover_filename or '未检测到封面文件' }}
+                            File đang có hiệu lực: {{ current_cover_filename or 'Không phát hiện file ảnh bìa' }}
                         </div>
                         <form method="post" action="{{ url_for('edit_task', task_id=task.id) }}" enctype="multipart/form-data" class="mb-2">
                             <input type="hidden" name="action" value="replace_cover">
-                            <label for="cover_file" class="form-label">更换视频封面</label>
+                            <label for="cover_file" class="form-label">Đổi ảnh bìa video</label>
                             <input class="form-control" type="file" id="cover_file" name="cover_file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required>
-                            <div class="form-text">支持 JPG、JPEG、PNG、WEBP。上传后会直接替换当前任务封面。</div>
+                            <div class="form-text">Hỗ trợ JPG, JPEG, PNG, WEBP. Sau khi tải lên sẽ thay thẳng ảnh bìa nhiệm vụ hiện tại.</div>
                             <button type="submit" class="btn btn-sm btn-warning mt-2">
-                                <i class="bi bi-image me-1"></i>上传新封面
+                                <i class="bi bi-image me-1"></i>Tải lên ảnh bìa mới
                             </button>
                         </form>
 
                         <form method="post" action="{{ url_for('edit_task', task_id=task.id) }}">
                             <input type="hidden" name="action" value="restore_cover">
                             <button type="submit" class="btn btn-sm btn-outline-secondary" {% if not (has_original_cover_backup and is_custom_cover_active) %}disabled{% endif %}>
-                                <i class="bi bi-arrow-counterclockwise me-1"></i>恢复原封面
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Khôi phục ảnh bìa gốc
                             </button>
                             <div class="form-text mt-1">
                                 {% if has_original_cover_backup %}
                                     {% if is_custom_cover_active %}
-                                        已检测到原始封面备份，可恢复。
+                                        Đã phát hiện bản sao lưu ảnh bìa gốc, có thể khôi phục.
                                     {% else %}
-                                        原始封面备份已存在，当前已在使用原始封面。
+                                        Bản sao lưu ảnh bìa gốc đã tồn tại, hiện đang dùng ảnh bìa gốc.
                                     {% endif %}
                                 {% else %}
-                                    首次成功替换封面后，才会生成可恢复的原始封面备份。
+                                    Chỉ sau lần đầu thay ảnh bìa thành công mới tạo bản sao lưu ảnh bìa gốc để khôi phục.
                                 {% endif %}
                             </div>
                         </form>
@@ -89,25 +89,25 @@
                 {% if task.moderation_result %}
                     <div class="card mb-4">
                         <div class="card-header">
-                            审核结果
+                            Kết quả kiểm duyệt
                         </div>
                         <div class="card-body">
                             {% set moderation = parse_json(task.moderation_result) %}
                             {% if moderation %}
                                 {% if not moderation.overall_pass %}
                                     <div class="alert alert-danger">
-                                        <i class="bi bi-x-circle"></i> <strong>审核不通过</strong>
+                                        <i class="bi bi-x-circle"></i> <strong>Kiểm duyệt không đạt</strong>
                                 </div>
                             {% else %}
                                     <div class="alert alert-success">
-                                        <i class="bi bi-check-circle"></i> <strong>审核通过</strong> (若有以下详情，建议检查)
+                                        <i class="bi bi-check-circle"></i> <strong>Kiểm duyệt đạt</strong> (Nếu có chi tiết dưới đây, nên kiểm tra)
                                     </div>
                                 {% endif %}
                                 
-                                {% for content_type, result in [('标题', moderation.title), ('描述', moderation.description)] %}
+                                {% for content_type, result in [('Tiêu đề', moderation.title), ('Mô tả', moderation.description)] %}
                                     {% if result and result.details %}
                                     <div class="moderation-item">
-                                            <h6><i class="bi bi-exclamation-triangle"></i> {{ content_type }}问题:</h6>
+                                            <h6><i class="bi bi-exclamation-triangle"></i> {{ content_type }} có vấn đề:</h6>
                                             <div class="list-group list-group-flush" role="list">{%- for detail in result.details %}
                                                     <div class="list-group-item 
                                                        {% if detail.suggestion == 'block' %}list-group-item-danger
@@ -119,13 +119,13 @@
                                                         {% endif %}
                                                         <br>
                                                         <small>
-                                                            原因: {{ detail.reason or '无' }}<br>
-                                                            建议: 
-                                                            {% if detail.suggestion == 'block' %}阻止发布
-                                                            {% elif detail.suggestion == 'review' %}人工复审
-                                                            {% else %}通过{% endif %}
+                                                            Nguyên nhân: {{ detail.reason or 'Không có' }}<br>
+                                                            Đề xuất: 
+                                                            {% if detail.suggestion == 'block' %}Chặn đăng tải
+                                                            {% elif detail.suggestion == 'review' %}Xem xét lại thủ công
+                                                            {% else %}Đạt{% endif %}
                                                             {% if detail.confidence %}
-                                                                (置信度: {{ "%.2f"|format(detail.confidence) }}%)
+                                                                (Độ tin cậy: {{ "%.2f"|format(detail.confidence) }}%)
                                                             {% endif %}
                                                         </small>
                                                     </div>
@@ -135,7 +135,7 @@
                                 {% endfor %}
                                 {% if moderation.tags and moderation.tags.details %}
                                     <div class="moderation-item">
-                                        <h6><i class="bi bi-exclamation-triangle"></i> 标签问题:</h6>
+                                        <h6><i class="bi bi-exclamation-triangle"></i> Thẻ tag có vấn đề:</h6>
                                         <div class="list-group list-group-flush" role="list">{%- for detail in moderation.tags.details %}
                                                 <div class="list-group-item 
                                                    {% if detail.suggestion == 'block' %}list-group-item-danger
@@ -147,13 +147,13 @@
                                                     {% endif %}
                                                     <br>
                                                     <small>
-                                                        原因: {{ detail.reason or '无' }}<br>
-                                                        建议: 
-                                                        {% if detail.suggestion == 'block' %}阻止发布
-                                                        {% elif detail.suggestion == 'review' %}人工复审
-                                                        {% else %}通过{% endif %}
+                                                        Nguyên nhân: {{ detail.reason or 'Không có' }}<br>
+                                                        Đề xuất: 
+                                                        {% if detail.suggestion == 'block' %}Chặn đăng tải
+                                                        {% elif detail.suggestion == 'review' %}Xem xét lại thủ công
+                                                        {% else %}Đạt{% endif %}
                                                         {% if detail.confidence %}
-                                                            (置信度: {{ "%.2f"|format(detail.confidence) }}%)
+                                                            (Độ tin cậy: {{ "%.2f"|format(detail.confidence) }}%)
                                                         {% endif %}
                                                     </small>
                                                 </div>
@@ -162,7 +162,7 @@
                                 {% endif %}
                             {% else %}
                                 <div class="alert alert-secondary">
-                                    <i class="bi bi-info-circle"></i> 未找到审核结果或审核已跳过。
+                                    <i class="bi bi-info-circle"></i> Không tìm thấy kết quả kiểm duyệt hoặc đã bỏ qua kiểm duyệt.
                                 </div>
                             {% endif %}
                         </div>
@@ -170,13 +170,13 @@
                 {% endif %}
             </div>
             
-            <!-- 右侧编辑表单 -->
+            <!-- Form chỉnh sửa bên phải -->
             <div class="col-md-8">
                 <form method="post" action="{{ url_for('edit_task', task_id=task.id) }}" id="task-edit-form">
                     <input type="hidden" name="default_action" value="save_metadata">
                     <div class="card mb-4">
                         <div class="card-header">
-                            编辑视频信息
+                            Chỉnh sửa thông tin video
                         </div>
                         <div class="card-body">
                             {% if task.error_message %}
@@ -185,7 +185,7 @@
                                 </div>
                             {% endif %}
                             <div class="mb-3">
-                                <label for="video_title_translated" class="form-label">视频标题</label>
+                                <label for="video_title_translated" class="form-label">Tiêu đề video</label>
                                 <input type="text" class="form-control" id="video_title_translated" name="video_title_translated" 
                                        value="{{ task.video_title_translated or task.video_title_original }}" required>
                                 {% if (upload_target|default('acfun')) in ['acfun', 'bilibili', 'both'] %}
@@ -193,20 +193,20 @@
                                 {% endif %}
                                 {% if not task.video_title_translated and task.video_title_original %}
                                     <div class="form-text text-warning">
-                                        当前显示的是原标题。自动翻译未成功，请确认或手动修改后再上传。
+                                        Đang hiển thị tiêu đề gốc. Dịch tự động chưa thành công, vui lòng xác nhận hoặc sửa tay rồi tải lên.
                                     </div>
                                 {% elif task.video_title_original %}
-                                    <div class="form-text">原始标题: {{ task.video_title_original }}</div>
+                                    <div class="form-text">Tiêu đề gốc: {{ task.video_title_original }}</div>
                                 {% endif %}
                             </div>
                             
                             <div class="mb-3">
-                                <label for="description_translated" class="form-label">视频描述</label>
+                                <label for="description_translated" class="form-label">Mô tả video</label>
                                 <textarea class="form-control" id="description_translated" name="description_translated" 
                                           rows="10">{{ task.description_translated or task.description_original }}</textarea>
                                 {% if not task.description_translated and task.description_original %}
                                     <div class="form-text text-warning">
-                                        当前显示的是原始简介。自动翻译未成功，请确认或手动修改后再上传。
+                                        Đang hiển thị mô tả gốc. Dịch tự động chưa thành công, vui lòng xác nhận hoặc sửa tay rồi tải lên.
                                     </div>
                                 {% endif %}
                                 {% if (upload_target|default('acfun')) in ['acfun', 'bilibili', 'both'] %}
@@ -215,7 +215,7 @@
                                 {% if task.description_original %}
                                     <button type="button" class="btn btn-sm btn-outline-secondary mt-2" data-bs-toggle="collapse" 
                                             data-bs-target="#original-description">
-                                        显示/隐藏原始描述
+                                        Hiện/ẩn mô tả gốc
                                     </button>
                                     <div class="collapse mt-2" id="original-description">
                                         <div class="card card-body bg-light">
@@ -229,14 +229,14 @@
                     
                     <div class="card mb-4">
                         <div class="card-header">
-                            分区设置
+                            Cài đặt chuyên mục
                         </div>
                         <div class="card-body">
                             {% if (upload_target|default('acfun')) == 'both' %}
                                 <div class="mb-3">
-                                    <label for="selected_partition_id_acfun" class="form-label">AcFun 分区</label>
+                                    <label for="selected_partition_id_acfun" class="form-label">Chuyên mục AcFun</label>
                                     <select class="form-select" id="selected_partition_id_acfun" name="selected_partition_id_acfun" required>
-                                        <option value="">-- 请选择 AcFun 分区 --</option>
+                                        <option value="">-- Vui lòng chọn chuyên mục AcFun --</option>
                                         {% for category in acfun_id_mapping %}
                                             <optgroup label="{{ category.category }}">
                                                 {% for partition in category.partitions %}
@@ -249,14 +249,14 @@
                                         {% endfor %}
                                     </select>
                                     {% if task.recommended_partition_id_acfun %}
-                                        <div class="form-text">AcFun AI推荐: {{ get_partition_name(task.recommended_partition_id_acfun, 'acfun') }} ({{ task.recommended_partition_id_acfun }})</div>
+                                        <div class="form-text">AcFun đề xuất: {{ get_partition_name(task.recommended_partition_id_acfun, 'acfun') }} ({{ task.recommended_partition_id_acfun }})</div>
                                     {% endif %}
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="selected_partition_id_bilibili" class="form-label">bilibili 分区</label>
+                                    <label for="selected_partition_id_bilibili" class="form-label">Chuyên mục bilibili</label>
                                     <select class="form-select" id="selected_partition_id_bilibili" name="selected_partition_id_bilibili" required>
-                                        <option value="">-- 请选择 bilibili 分区 --</option>
+                                        <option value="">-- Vui lòng chọn chuyên mục bilibili --</option>
                                         {% for category in bilibili_id_mapping %}
                                             <optgroup label="{{ category.category }}">
                                                 {% for partition in category.partitions %}
@@ -269,7 +269,7 @@
                                         {% endfor %}
                                     </select>
                                     {% if task.recommended_partition_id_bilibili %}
-                                        <div class="form-text">bilibili AI推荐: {{ get_partition_name(task.recommended_partition_id_bilibili, 'bilibili') }} ({{ task.recommended_partition_id_bilibili }})</div>
+                                        <div class="form-text">bilibili đề xuất: {{ get_partition_name(task.recommended_partition_id_bilibili, 'bilibili') }} ({{ task.recommended_partition_id_bilibili }})</div>
                                     {% endif %}
                                 </div>
                             {% else %}
@@ -282,9 +282,9 @@
                                     {% set current_recommended_partition_id = task.recommended_partition_id_acfun or task.recommended_partition_id %}
                                 {% endif %}
                                 <div class="mb-3">
-                                    <label for="selected_partition_id" class="form-label">选择分区</label>
+                                    <label for="selected_partition_id" class="form-label">Chọn chuyên mục</label>
                                     <select class="form-select" id="selected_partition_id" name="selected_partition_id" required>
-                                        <option value="">-- 请选择分区 --</option>
+                                        <option value="">-- Vui lòng chọn chuyên mục --</option>
                                         {% for category in id_mapping %}
                                             <optgroup label="{{ category.category }}">
                                                 {% for partition in category.partitions %}
@@ -297,7 +297,7 @@
                                         {% endfor %}
                                     </select>
                                     {% if current_recommended_partition_id %}
-                                        <div class="form-text">AI推荐分区: {{ get_partition_name(current_recommended_partition_id, current_target) }} ({{ current_recommended_partition_id }})</div>
+                                        <div class="form-text">Chuyên mục AI đề xuất: {{ get_partition_name(current_recommended_partition_id, current_target) }} ({{ current_recommended_partition_id }})</div>
                                     {% endif %}
                                 </div>
                             {% endif %}
@@ -306,21 +306,21 @@
                     
                     <div class="card mb-4">
                         <div class="card-header">
-                            标签设置
+                            Cài đặt thẻ tag
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label class="form-label">视频标签（每个不超过20个字符，最多6个）</label>
+                                <label class="form-label">Thẻ tag video (mỗi tag không quá 20 ký tự, tối đa 6 tag)</label>
                                 <div class="row g-2">
                                     {% set tags = tags_string.split(',') if tags_string else [] %}
                                     {% for i in range(6) %}
                                     <div class="col-6 col-md-4">
-                                        <input type="text" class="form-control tag-input" maxlength="20" name="tag_input_{{i}}" placeholder="标签{{i+1}}" value="{{ tags[i]|trim if tags|length > i else '' }}">
+                                        <input type="text" class="form-control tag-input" maxlength="20" name="tag_input_{{i}}" placeholder="Thẻ tag{{i+1}}" value="{{ tags[i]|trim if tags|length > i else '' }}">
                                     </div>
                                     {% endfor %}
                                 </div>
                                 <input type="hidden" id="tags_json" name="tags_json" value="{{ task.tags_generated or '[]' }}">
-                                <div class="form-text">最多可添加6个标签，每个标签不超过20个字符</div>
+                                <div class="form-text">Tối đa 6 thẻ tag, mỗi tag không quá 20 ký tự</div>
                             </div>
                             <div id="tags-container" class="mb-3 d-flex flex-wrap gap-2"></div>
                         </div>
@@ -329,22 +329,22 @@
                     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
                         <div class="d-flex flex-wrap gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save me-1"></i> 保存修改
+                                <i class="bi bi-save me-1"></i> Lưu thay đổi
                             </button>
                             <button type="submit" name="action" value="force_upload" class="btn btn-success" {% if not can_upload %}disabled{% endif %}>
-                                <i class="bi bi-cloud-upload me-1"></i> 上传到{{ '双平台' if (upload_target|default('acfun')) == 'both' else ('bilibili' if (upload_target|default('acfun')) == 'bilibili' else 'AcFun') }}
+                                <i class="bi bi-cloud-upload me-1"></i> Tải lên {{ 'Cả hai nền tảng' if (upload_target|default('acfun')) == 'both' else ('bilibili' if (upload_target|default('acfun')) == 'bilibili' else 'AcFun') }}
                             </button>
                         </div>
-                        <a href="{{ url_for('tasks') }}" class="btn btn-outline-secondary">取消</a>
+                        <a href="{{ url_for('tasks') }}" class="btn btn-outline-secondary">Hủy</a>
                     </div>
                     
                     <div class="mt-3">
                         <div class="alert alert-info small mb-0">
-                            <i class="bi bi-info-circle"></i> “保存修改”只更新标题、描述、分区和标签；“上传到{{ '双平台' if (upload_target|default('acfun')) == 'both' else ('bilibili' if (upload_target|default('acfun')) == 'bilibili' else 'AcFun') }}”会先保存当前修改，再在后台启动上传。
+                            <i class="bi bi-info-circle"></i> “Lưu thay đổi” chỉ cập nhật tiêu đề, mô tả, chuyên mục và thẻ tag; “Tải lên {{ 'Cả hai nền tảng' if (upload_target|default('acfun')) == 'both' else ('bilibili' if (upload_target|default('acfun')) == 'bilibili' else 'AcFun') }}” sẽ lưu thay đổi hiện tại trước, rồi khởi động tải lên trong nền.
                             {% if can_upload %}
-                                <br><strong>当前状态：{{ task_status_display(task.status) }}，可以直接上传。</strong>
+                                <br><strong>Trạng thái hiện tại: {{ task_status_display(task.status) }}, có thể tải lên ngay.</strong>
                             {% else %}
-                                <br><strong>当前状态：{{ task_status_display(task.status) }}，请先等待任务处理完成，或先保存使其进入可上传状态。</strong>
+                                <br><strong>Trạng thái hiện tại: {{ task_status_display(task.status) }}, vui lòng đợi nhiệm vụ xử lý xong, hoặc lưu trước để chuyển sang trạng thái có thể tải lên.</strong>
                             {% endif %}
                         </div>
                     </div>
@@ -353,7 +353,7 @@
         </div>
     {% else %}
         <div class="alert alert-danger">
-            未找到任务信息，请返回<a href="{{ url_for('tasks') }}">任务列表</a>重新选择。
+            Không tìm thấy thông tin nhiệm vụ, vui lòng quay lại <a href="{{ url_for('tasks') }}">Danh sách nhiệm vụ</a> để chọn lại.
         </div>
     {% endif %}
 </div>
@@ -363,9 +363,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var _platformConfig = {
-            'both':     { titleSoft: 50,  titleHard: 50,  descSoft: 1000, descHard: 1000, titleMsg: '已开启双平台投稿，标题按共同最低限制 50 字执行，超出部分会在上传时自动截断。', descMsg: '已开启双平台投稿，简介按共同最低限制 1000 字执行，超出部分会在上传时自动截断。' },
-            'bilibili': { titleSoft: 80,  titleHard: 80,  descSoft: 2000, descHard: 2000, titleMsg: 'bilibili 标题上限为 80 字，超出部分会在上传时自动截断。', descMsg: 'bilibili 简介上限为 2000 字，超出部分会在上传时自动截断。' },
-            'acfun':    { titleSoft: 50,  titleHard: 50,  descSoft: 1000, descHard: 1000, titleMsg: 'AcFun 标题上限为 50 字，超出部分会在上传时自动截断。', descMsg: 'AcFun 简介上限为 1000 字，超出部分会在上传时自动截断。' }
+            'both':     { titleSoft: 50,  titleHard: 50,  descSoft: 1000, descHard: 1000, titleMsg: 'Đã bật đăng tải cả hai nền tảng, tiêu đề áp dụng giới hạn thấp chung là 50 ký tự, phần vượt sẽ tự cắt khi tải lên.', descMsg: 'Đã bật đăng tải cả hai nền tảng, mô tả áp dụng giới hạn thấp chung là 1000 ký tự, phần vượt sẽ tự cắt khi tải lên.' },
+            'bilibili': { titleSoft: 80,  titleHard: 80,  descSoft: 2000, descHard: 2000, titleMsg: 'Tiêu đề bilibili giới hạn 80 ký tự, phần vượt sẽ tự cắt khi tải lên.', descMsg: 'Mô tả bilibili giới hạn 2000 ký tự, phần vượt sẽ tự cắt khi tải lên.' },
+            'acfun':    { titleSoft: 50,  titleHard: 50,  descSoft: 1000, descHard: 1000, titleMsg: 'Tiêu đề AcFun giới hạn 50 ký tự, phần vượt sẽ tự cắt khi tải lên.', descMsg: 'Mô tả AcFun giới hạn 1000 ký tự, phần vượt sẽ tự cắt khi tải lên.' }
         };
         var _cfg = _platformConfig[document.querySelector('.edit-task-container').dataset.uploadTarget] || _platformConfig['acfun'];
 
@@ -379,7 +379,7 @@
                 return;
             }
             const length = field.value.length;
-            hintEl.textContent = `${baseText} 当前 ${length}。`;
+            hintEl.textContent = `${baseText} Hiện tại ${length}。`;
             hintEl.classList.toggle('text-warning', length > softLimit);
             hintEl.classList.toggle('text-danger', length > hardLimit);
         }
@@ -410,12 +410,12 @@
             );
         }
 
-        // 标签管理
+        // Quản lý thẻ tag
         const tagInputs = document.querySelectorAll('.tag-input');
         const tagsJsonField = document.getElementById('tags_json');
         const tagsContainer = document.getElementById('tags-container');
         
-        // 初始化标签显示
+        // Khởi tạo hiển thị thẻ tag
         function updateTagsDisplay() {
             tagsContainer.innerHTML = '';
             try {
@@ -432,11 +432,11 @@
                     tagsContainer.appendChild(tagElement);
                 });
             } catch (e) {
-                console.error('解析标签出错:', e);
+                console.error('Lỗi phân tích thẻ tag:', e);
             }
         }
         
-        // 收集所有输入框的标签，去重、去空、限制长度
+        // Thu thập thẻ tag từ mọi ô nhập, loại trùng, loại rỗng, giới hạn độ dài
         function collectTags() {
             const tags = [];
             tagInputs.forEach(input => {
@@ -449,15 +449,15 @@
                 updateTagsDisplay();
         }
         
-        // 绑定输入事件
+        // Gắn sự kiện nhập
         tagInputs.forEach(input => {
             input.addEventListener('input', collectTags);
         });
 
-        // 初始化时同步一次
+        // Đồng bộ một lần khi khởi tạo
         collectTags();
 
-        // 提交前收集一次，防止遗漏
+        // Thu thập một lần trước khi gửi, tránh sót
         const form = tagsJsonField.closest('form');
         if (form) {
             form.addEventListener('submit', function(e) {
@@ -465,7 +465,7 @@
             });
         }
         
-        // 封面处理模式切换
+        // Chuyển chế độ xử lý ảnh bìa
         const coverModeSwitch = document.getElementById('cover-mode-switch');
         const toggleCoverModeBtn = document.getElementById('toggle-cover-mode');
         
@@ -486,15 +486,15 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // 刷新页面以显示新封面
+                        // Làm mới trang để hiển thị ảnh bìa mới
                         location.reload();
                     } else {
-                        alert('更新封面处理模式失败: ' + data.message);
+                        alert('Cập nhật chế độ xử lý ảnh bìa thất bại: ' + data.message);
                     }
                 })
                 .catch(error => {
-                    console.error('更新封面处理模式出错:', error);
-                    alert('更新失败: ' + error);
+                    console.error('Lỗi cập nhật chế độ xử lý ảnh bìa:', error);
+                    alert('Cập nhật thất bại: ' + error);
                 });
             });
         }

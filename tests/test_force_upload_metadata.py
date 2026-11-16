@@ -271,7 +271,7 @@ class ForceUploadMetadataTests(unittest.TestCase):
 
         self.assertEqual(
             missing_upload_partition_labels(task, {'RECOMMEND_PARTITION': 'false'}),
-            ['AcFun 分区', 'bilibili 分区'],
+            ['Chuyên mục AcFun', 'Chuyên mục bilibili'],
         )
         self.assertEqual(
             missing_upload_partition_labels(task, {'RECOMMEND_PARTITION': True}),

@@ -41,7 +41,7 @@ def _task_title(payload: dict[str, Any]) -> str:
         value = _as_text(payload.get(key))
         if value:
             return value
-    return "未命名任务"
+    return "Nhiệm vụ chưa đặt tên"
 
 
 def _task_platform_result(payload: dict[str, Any]) -> str:
@@ -51,13 +51,13 @@ def _task_platform_result(payload: dict[str, Any]) -> str:
     if payload.get("bilibili_uploaded"):
         succeeded.append("bilibili")
     if succeeded:
-        return "、".join(succeeded)
+        return ", ".join(succeeded)
     return _upload_target_label(payload.get("upload_target"))
 
 
 def _pretty_error_text(value: Any) -> str:
     text = _truncate(_as_text(value), 300)
-    return text or "未提供错误详情"
+    return text or "Chưa cung cấp chi tiết lỗi"
 
 
 def _markdown_lines(*lines: str) -> str:
@@ -82,56 +82,56 @@ def build_notification_message(event: NotificationEvent) -> NotificationMessage:
     event_type = event.event_type
 
     if event_type == EVENT_TASK_ADDED:
-        title = "Y2A-Auto 📋 任务已添加"
+        title = "Y2A-Auto 📋 Đã thêm nhiệm vụ"
         summary = f"{payload.get('task_id', '')[:8]} | {_upload_target_label(payload.get('upload_target'))}"
         body = _section_block(
-            _kv("任务 ID", f"`{_as_text(payload.get('task_id'))}`"),
-            _kv("投稿目标", _upload_target_label(payload.get("upload_target"))),
+            _kv("ID nhiệm vụ", f"`{_as_text(payload.get('task_id'))}`"),
+            _kv("Nền tảng đăng tải", _upload_target_label(payload.get("upload_target"))),
             _kv("YouTube URL", _truncate(_as_text(payload.get("youtube_url")), 500)),
-            _kv("时间", _as_text(payload.get("occurred_at"))),
+            _kv("Thời gian", _as_text(payload.get("occurred_at"))),
         )
-        markdown = _markdown_lines("**📋 任务已添加**", "", body)
+        markdown = _markdown_lines("**📋 Đã thêm nhiệm vụ**", "", body)
         return NotificationMessage(title=title, summary=summary, markdown=markdown)
 
     if event_type == EVENT_TASK_COMPLETED:
         task_title = _task_title(payload)
         platform_result = _task_platform_result(payload)
-        title = "Y2A-Auto ✅ 任务已完成"
+        title = "Y2A-Auto ✅ Nhiệm vụ đã hoàn thành"
         summary = f"{task_title} | {platform_result}"
         body = _section_block(
-            _kv("视频标题", _truncate(task_title, 120)),
-            _kv("任务 ID", f"`{_as_text(payload.get('task_id'))}`"),
-            _kv("投稿结果", platform_result),
-            _kv("投稿目标", _upload_target_label(payload.get("upload_target"))),
-            _kv("时间", _as_text(payload.get("occurred_at"))),
+            _kv("Tiêu đề video", _truncate(task_title, 120)),
+            _kv("ID nhiệm vụ", f"`{_as_text(payload.get('task_id'))}`"),
+            _kv("Kết quả đăng tải", platform_result),
+            _kv("Nền tảng đăng tải", _upload_target_label(payload.get("upload_target"))),
+            _kv("Thời gian", _as_text(payload.get("occurred_at"))),
         )
-        markdown = _markdown_lines("**✅ 任务已完成**", "", body)
+        markdown = _markdown_lines("**✅ Nhiệm vụ đã hoàn thành**", "", body)
         return NotificationMessage(title=title, summary=summary, markdown=markdown)
 
     if event_type == EVENT_TASK_FAILED:
         task_title = _task_title(payload)
         error_text = _pretty_error_text(payload.get("error_message"))
-        title = "Y2A-Auto ❌ 任务失败"
+        title = "Y2A-Auto ❌ Nhiệm vụ thất bại"
         summary = f"{task_title} | {error_text}"
         body = _section_block(
-            _kv("视频标题", _truncate(task_title, 120)),
-            _kv("任务 ID", f"`{_as_text(payload.get('task_id'))}`"),
-            _kv("当前状态", _as_text(payload.get("status")) or "failed"),
-            _kv("投稿目标", _upload_target_label(payload.get("upload_target"))),
+            _kv("Tiêu đề video", _truncate(task_title, 120)),
+            _kv("ID nhiệm vụ", f"`{_as_text(payload.get('task_id'))}`"),
+            _kv("Trạng thái hiện tại", _as_text(payload.get("status")) or "failed"),
+            _kv("Nền tảng đăng tải", _upload_target_label(payload.get("upload_target"))),
         )
-        markdown = _markdown_lines("**❌ 任务失败**", "", body, "", f"> **错误详情：**", f"> {error_text}", "", f"> {_kv('时间', _as_text(payload.get('occurred_at')))}")
+        markdown = _markdown_lines("**❌ Nhiệm vụ thất bại**", "", body, "", f"> **Chi tiết lỗi:**", f"> {error_text}", "", f"> {_kv('Thời gian', _as_text(payload.get('occurred_at')))}")
         return NotificationMessage(title=title, summary=summary, markdown=markdown)
 
     if event_type == EVENT_LOGIN_SUCCESS:
         ip = _as_text(payload.get("ip_address")) or "unknown"
         occurred_at = _as_text(payload.get("occurred_at"))
-        title = "Y2A-Auto 🔐 后台登录成功"
+        title = "Y2A-Auto 🔐 Đăng nhập trang quản trị thành công"
         summary = f"{ip} | {occurred_at}"
         body = _section_block(
-            _kv("来源 IP", ip),
-            _kv("时间", occurred_at),
+            _kv("IP nguồn", ip),
+            _kv("Thời gian", occurred_at),
         )
-        markdown = _markdown_lines("**🔐 后台登录成功**", "", body)
+        markdown = _markdown_lines("**🔐 Đăng nhập trang quản trị thành công**", "", body)
         return NotificationMessage(title=title, summary=summary, markdown=markdown)
 
     if event_type == EVENT_LOGIN_LOCKED:
@@ -140,40 +140,40 @@ def build_notification_message(event: NotificationEvent) -> NotificationMessage:
         max_att = _as_text(payload.get("max_attempts"))
         lock_min = _as_text(payload.get("lock_minutes"))
         occurred_at = _as_text(payload.get("occurred_at"))
-        title = "Y2A-Auto 🚫 登录已被锁定"
-        summary = f"{failed}/{max_att} | {lock_min} 分钟"
+        title = "Y2A-Auto 🚫 Đăng nhập đã bị khóa"
+        summary = f"{failed}/{max_att} | {lock_min} phút"
         body = _section_block(
-            _kv("来源 IP", ip),
-            _kv("失败次数", f"{failed}/{max_att}"),
-            _kv("锁定时长", f"{lock_min} 分钟"),
-            _kv("时间", occurred_at),
+            _kv("IP nguồn", ip),
+            _kv("Số lần thất bại", f"{failed}/{max_att}"),
+            _kv("Thời gian khóa", f"{lock_min} phút"),
+            _kv("Thời gian", occurred_at),
         )
-        markdown = _markdown_lines("**🚫 登录已被锁定**", "", body)
+        markdown = _markdown_lines("**🚫 Đăng nhập đã bị khóa**", "", body)
         return NotificationMessage(title=title, summary=summary, markdown=markdown)
 
     if event_type in (EVENT_QR_LOGIN_SUCCESS, EVENT_QR_LOGIN_FAILED):
-        platform = _as_text(payload.get("platform")) or "平台"
+        platform = _as_text(payload.get("platform")) or "nền tảng"
         is_success = event_type == EVENT_QR_LOGIN_SUCCESS
         icon = "✅" if is_success else "❌"
-        status_text = "成功" if is_success else "失败"
-        message = _truncate(_as_text(payload.get("message")) or ("Cookies 已保存" if is_success else "登录失败"), 300)
+        status_text = "Thành công" if is_success else "Thất bại"
+        message = _truncate(_as_text(payload.get("message")) or ("Đã lưu Cookies" if is_success else "Đăng nhập thất bại"), 300)
         occurred_at = _as_text(payload.get("occurred_at"))
-        title = f"Y2A-Auto {icon} {platform}扫码登录{status_text}"
+        title = f"Y2A-Auto {icon} {platform} đăng nhập bằng mã QR {status_text}"
         summary = f"{platform} | {message}"
         body = _section_block(
-            _kv("平台", platform),
-            _kv("结果", message),
-            _kv("时间", occurred_at),
+            _kv("Nền tảng", platform),
+            _kv("Kết quả", message),
+            _kv("Thời gian", occurred_at),
         )
-        markdown = _markdown_lines(f"**{icon} {platform}扫码登录{status_text}**", "", body)
+        markdown = _markdown_lines(f"**{icon} {platform} đăng nhập bằng mã QR {status_text}**", "", body)
         return NotificationMessage(title=title, summary=summary, markdown=markdown)
 
-    title = "Y2A-Auto 💬 系统通知"
+    title = "Y2A-Auto 💬 Thông báo hệ thống"
     serialized = json.dumps(payload, ensure_ascii=False)
     summary = _truncate(serialized, 180)
     body = _section_block(
-        _kv("事件", event_type),
-        _kv("内容", _truncate(serialized, 1500)),
+        _kv("Sự kiện", event_type),
+        _kv("Nội dung", _truncate(serialized, 1500)),
     )
-    markdown = _markdown_lines("**💬 系统通知**", "", body)
+    markdown = _markdown_lines("**💬 Thông báo hệ thống**", "", body)
     return NotificationMessage(title=title, summary=summary, markdown=markdown)

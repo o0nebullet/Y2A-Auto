@@ -182,9 +182,9 @@ class SettingsRangeGuardTests(_SettingsSaveTestCase):
                 text = warnings[0]
                 self.assertIn(key, text, msg=f'提示未点名被回退的键: {text}')
                 self.assertIn(str(submitted), text, msg=f'提示未给出提交值: {text}')
-                self.assertIn('生效', text, msg=f'提示未给出最终生效值: {text}')
+                self.assertIn('Có hiệu lực', text, msg=f'提示未给出最终生效值: {text}')
                 self.assertIn(
-                    '配置已成功保存', [msg['text'] for msg in result['messages']],
+                    'Đã lưu cấu hình thành công', [msg['text'] for msg in result['messages']],
                     msg='保存本身的成功提示不应被回退提示替换')
                 self.assertEqual(result['final_level'], 'warning')
 
@@ -239,7 +239,7 @@ class AudioChunkCrossGuardTests(_SettingsSaveTestCase):
         warnings = self._warnings(result)
         self.assertEqual(len(warnings), 1, msg=warnings)
         self.assertIn('AUDIO_CHUNK_OVERLAP_S', warnings[0])
-        self.assertIn('分片窗口', warnings[0])
+        self.assertIn('cửa sổ phân đoạn', warnings[0])
 
     def test_只提交重叠时按已存窗口钳制(self):
         # 脚本可只提交一个键，此时窗口取已存配置值，避免写入违反不变量的组合
@@ -277,7 +277,7 @@ class AudioChunkCrossGuardTests(_SettingsSaveTestCase):
         warnings = self._warnings(result)
         self.assertEqual(len(warnings), 1, msg=warnings)
         self.assertIn('AUDIO_CHUNK_OVERLAP_S', warnings[0])
-        self.assertIn('分片窗口', warnings[0])
+        self.assertIn('cửa sổ phân đoạn', warnings[0])
         self.assertEqual(result['final_level'], 'warning')
 
     def test_只提交窗口且不越界时不误报(self):
@@ -449,10 +449,10 @@ class EmbedGateCopyTests(unittest.TestCase):
     """设置页文案必须与 modules/task_manager 的烧录门控语义一致。
 
     两个开关的作用域互不重叠，文案写错会让用户按错误预期取消勾选：
-    - ASR_FAILURE_BLOCKS_EMBED 只放宽「ASR 来源结局」与「质检没跑成」，
+    - ASR_FAILURE_BLOCKS_EMBED 只放宽「Kết quả nguồn ASR」与「Kiểm tra chất lượng không chạy được」，
       质检给出的明确失败结论始终生效；
     - SUBTITLE_QC_ENABLED 关闭时不再看历史质检结论、也不再要求降级素材
-      通过严格质检（否则「关掉质检反而更严格」），但 ASR 来源失败仍拦截。
+      通过严格质检（否则「tắt kiểm tra chất lượng mà lại nghiêm hơn」），但 ASR 来源失败仍拦截。
     """
 
     @classmethod
@@ -472,15 +472,15 @@ class EmbedGateCopyTests(unittest.TestCase):
 
     def test_ASR异常禁止烧录文案点明质检结论不受影响(self):
         copy = self._copy_for('ASR_FAILURE_BLOCKS_EMBED')
-        self.assertIn('ASR 来源结局', copy, msg=f'未说明放宽范围: {copy}')
-        self.assertIn('质检没跑成', copy, msg=f'未说明「质检没跑成」也被放宽: {copy}')
-        self.assertIn('始终生效', copy, msg=f'未声明质检结论不受本开关影响: {copy}')
+        self.assertIn('Kết quả nguồn ASR', copy, msg=f'未说明放宽范围: {copy}')
+        self.assertIn('Kiểm tra chất lượng không chạy được', copy, msg=f'未说明「Kiểm tra chất lượng không chạy được」也被放宽: {copy}')
+        self.assertIn('luôn có hiệu lực', copy, msg=f'未声明质检结论不受本开关影响: {copy}')
 
     def test_质检开关文案点明关闭语义与跑不成的区别(self):
         copy = self._copy_for('SUBTITLE_QC_ENABLED')
-        self.assertIn('更严格', copy, msg=f'未说明关闭质检不应更严格: {copy}')
-        self.assertIn('没跑成', copy, msg=f'未区分「主动关闭」与「质检没跑成」: {copy}')
-        self.assertIn('拦截', copy, msg=f'未说明 ASR 来源失败仍会拦截: {copy}')
+        self.assertIn('nghiêm ngặt', copy, msg=f'未说明关闭质检不应更严格: {copy}')
+        self.assertIn('không chạy được', copy, msg=f'未区分「主动关闭」与「Kiểm tra chất lượng không chạy được」: {copy}')
+        self.assertIn('chặn', copy, msg=f'未说明 ASR 来源失败仍会拦截: {copy}')
 
 
 class NumericWhitelistControlCoverageTests(unittest.TestCase):

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}登录 - Y2A-Auto{% endblock %}
+{% block title %}Đăng nhập - Y2A-Auto{% endblock %}
 
 {% block extra_css %}{% endblock %}
 
@@ -15,20 +15,20 @@
                 </div>
             </div>
 
-            <div class="text-center login-subtitle">请输入管理员密码以继续访问控制台</div>
+            <div class="text-center login-subtitle">Vui lòng nhập mật khẩu quản trị để tiếp tục vào bảng điều khiển</div>
 
             <form method="post" action="{{ url_for('login', next=request.args.get('next')) }}">
                 <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="密码" required>
-                    <label for="password">密码</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu" required>
+                    <label for="password">Mật khẩu</label>
                 </div>
 
                 <div class="d-grid">
-                    <button class="btn btn-login" type="submit">登录</button>
+                    <button class="btn btn-login" type="submit">Đăng nhập</button>
                 </div>
             </form>
 
-            <div class="login-help">忘记密码请联系系统管理员</div>
+            <div class="login-help">Quên mật khẩu, vui lòng liên hệ quản trị hệ thống</div>
         </div>
     </div>
     
@@ -37,10 +37,10 @@
 
 {% block extra_js %}
 <script>
-    // 聚焦密码输入框，若元素存在
+    // Focus vào ô nhập mật khẩu nếu phần tử tồn tại
     const pwd = document.getElementById('password');
     if(pwd){ pwd.focus(); pwd.select(); }
-    // 给 body 添加登录专用类以启用全屏布局样式（在 base.html 中不会干扰其他页面）
+    // Thêm class riêng cho trang đăng nhập vào body để bật bố cục toàn màn hình (không ảnh hưởng trang khác trong base.html)
     if(document && document.body) document.body.classList.add('login-fullscreen');
 </script>
 {% endblock %}

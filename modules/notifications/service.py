@@ -184,25 +184,25 @@ class NotificationService:
         config = dict(self.config or {})
         notifier = self._registry.get(channel_id)
         if not notifier:
-            raise ValueError(f"不支持的通知渠道: {channel_id}")
+            raise ValueError(f"Kênh thông báo không được hỗ trợ: {channel_id}")
 
         missing_fields = notifier.validate_config(config)
         if missing_fields:
             readable = "、".join(missing_fields)
-            raise ValueError(f"{CHANNEL_LABELS.get(channel_id, channel_id)} 配置不完整：缺少 {readable}")
+            raise ValueError(f"{CHANNEL_LABELS.get(channel_id, channel_id)} cấu hình chưa đầy đủ: thiếu {readable}")
 
         now_text = _current_ts()
         channel_label = CHANNEL_LABELS.get(channel_id, channel_id)
         message = NotificationMessage(
-            title=f"Y2A-Auto 🔔 测试消息",
-            summary=f"{channel_label} 测试发送成功触发",
+            title=f"Y2A-Auto 🔔 Tin nhắn kiểm tra",
+            summary=f"{channel_label} đã kích hoạt gửi kiểm tra thành công",
             markdown="\n".join(
                 (
-                    "**🔔 Y2A-Auto 测试消息**",
+                    "**🔔 Tin nhắn kiểm tra Y2A-Auto**",
                     "",
-                    f"> **推送渠道：**{channel_label}",
-                    f"> **发送时间：**{now_text}",
-                    f"> **说明：**如果你收到这条消息，说明当前渠道配置可用。",
+                    f"> **Kênh đẩy:** {channel_label}",
+                    f"> **Thời gian gửi:** {now_text}",
+                    f"> **Lưu ý:** Nếu bạn nhận được tin nhắn này, nghĩa là cấu hình kênh hiện tại có thể dùng được.",
                 )
             ),
         )
@@ -303,13 +303,13 @@ class NotificationService:
         event_type = str(row.get("event_type") or "").strip()
         notifier = self._registry.get(channel_id)
         if not notifier:
-            self._mark_failed(row["id"], int(row.get("attempts") or 0) + 1, f"未知通知渠道: {channel_id}")
+            self._mark_failed(row["id"], int(row.get("attempts") or 0) + 1, f"Kênh thông báo không xác định: {channel_id}")
             return
 
         try:
             payload = json.loads(str(row.get("payload_json") or "{}"))
         except Exception as exc:
-            self._mark_failed(row["id"], int(row.get("attempts") or 0) + 1, f"通知载荷解析失败: {exc}")
+            self._mark_failed(row["id"], int(row.get("attempts") or 0) + 1, f"Phân tích tải thông báo thất bại: {exc}")
             return
 
         event = NotificationEvent(event_type=event_type, payload=payload, occurred_at=str(payload.get("occurred_at") or _current_ts()))

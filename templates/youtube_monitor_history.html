@@ -1,64 +1,64 @@
 {% extends "base.html" %}
 
-{% block title %}监控历史 - {{ config.name }} - Y2A-Auto{% endblock %}
+{% block title %}Lịch sử giám sát - {{ config.name }} - Y2A-Auto{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>
-        <i class="bi bi-clock-history"></i> 监控历史
+        <i class="bi bi-clock-history"></i> Lịch sử giám sát
         <small class="text-muted">- {{ config.name }}</small>
     </h2>
     <a href="{{ url_for('youtube_monitor_index') }}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> 返回
+        <i class="bi bi-arrow-left"></i> Quay lại
     </a>
 </div>
 
-<!-- 配置信息摘要 -->
+<!-- Tóm tắt thông tin cấu hình -->
 <div class="card mb-4">
     <div class="card-header">
-        <h6 class="mb-0"><i class="bi bi-info-circle"></i> 配置信息</h6>
+        <h6 class="mb-0"><i class="bi bi-info-circle"></i> Thông tin cấu hình</h6>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-2">
-                <strong>状态：</strong>
+                <strong>Trạng thái: </strong>
                 {% if config.enabled %}
-                <span class="badge bg-success">启用</span>
+                <span class="badge bg-success">Bật</span>
                 {% else %}
-                <span class="badge bg-secondary">禁用</span>
+                <span class="badge bg-secondary">Tắt</span>
                 {% endif %}
             </div>
             <div class="col-md-2">
-                <strong>地区：</strong> {{ config.region_code }}
+                <strong>Khu vực: </strong> {{ config.region_code }}
             </div>
             <div class="col-md-2">
-                <strong>时间段：</strong>
+                <strong>Khoảng thời gian: </strong>
                 {% if config.monitor_type == 'channel_monitor' and config.channel_mode == 'historical' %}
                     {% if config.start_date and config.end_date %}
-                        {{ config.start_date }} 至 {{ config.end_date }}
+                        {{ config.start_date }} đến {{ config.end_date }}
                     {% elif config.start_date %}
-                        从 {{ config.start_date }} 开始
+                        Từ {{ config.start_date }} trở đi
                     {% else %}
-                        历史搬运模式
+                        Chế độ chuyển video cũ
                     {% endif %}
                 {% elif config.monitor_type == 'channel_monitor' and config.channel_mode == 'latest' %}
-                    最新 {{ config.latest_days or 7 }} 天
+                    Mới nhất {{ config.latest_days or 7 }} ngày
                 {% else %}
-                    {{ config.time_period or 7 }} 天
+                    {{ config.time_period or 7 }} ngày
                 {% endif %}
             </div>
             <div class="col-md-2">
-                <strong>最大结果：</strong> {{ config.max_results }}
+                <strong>Số kết quả tối đa: </strong> {{ config.max_results }}
             </div>
             <div class="col-md-2">
-                <strong>最小观看数：</strong> {{ config.min_view_count|int }}
+                <strong>Lượt xem tối thiểu: </strong> {{ config.min_view_count|int }}
             </div>
             <div class="col-md-2">
-                <strong>调度：</strong>
+                <strong>Lịch chạy: </strong>
                 {% if config.schedule_type == 'auto' %}
-                <span class="badge bg-info">自动({{ config.schedule_interval }}分钟)</span>
+                <span class="badge bg-info">Tự động ({{ config.schedule_interval }}phút)</span>
                 {% else %}
-                <span class="badge bg-warning">手动</span>
+                <span class="badge bg-warning">Thủ công</span>
                 {% endif %}
             </div>
         </div>
@@ -66,7 +66,7 @@
         {% if config.keywords %}
         <div class="row mt-2">
             <div class="col-12">
-                <strong>关键词：</strong> {{ config.keywords }}
+                <strong>Từ khóa: </strong> {{ config.keywords }}
             </div>
         </div>
         {% endif %}
@@ -74,7 +74,7 @@
         {% if config.exclude_keywords %}
         <div class="row mt-2">
             <div class="col-12">
-                <strong>排除关键词：</strong> {{ config.exclude_keywords }}
+                <strong>Từ khóa loại trừ: </strong> {{ config.exclude_keywords }}
             </div>
         </div>
         {% endif %}
@@ -82,8 +82,8 @@
         {% if config.title_keywords %}
         <div class="row mt-2">
             <div class="col-12">
-                <strong>标题包含关键词：</strong> {{ config.title_keywords }}
-                {% if config.title_match_mode == 'all' %}<span class="badge bg-secondary">全部匹配</span>{% else %}<span class="badge bg-light text-dark">任一匹配</span>{% endif %}
+                <strong>Tiêu đề chứa từ khóa: </strong> {{ config.title_keywords }}
+                {% if config.title_match_mode == 'all' %}<span class="badge bg-secondary">Khớp tất cả</span>{% else %}<span class="badge bg-light text-dark">Khớp bất kỳ</span>{% endif %}
             </div>
         </div>
         {% endif %}
@@ -91,51 +91,51 @@
         {% if config.last_run_time %}
         <div class="row mt-2">
             <div class="col-12">
-                <strong>最后运行：</strong> {{ config.last_run_time }}
+                <strong>Lần chạy cuối: </strong> {{ config.last_run_time }}
             </div>
         </div>
         {% endif %}
     </div>
 </div>
 
-<!-- 操作按钮 -->
+<!-- Nút thao tác -->
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4><i class="bi bi-list"></i> 监控记录</h4>
+    <h4><i class="bi bi-list"></i> Bản ghi giám sát</h4>
     <div>
         <form method="POST" action="{{ url_for('youtube_monitor_run', config_id=config.id) }}" class="d-inline monitor-run-form">
             <button type="submit" class="btn btn-success">
-                <i class="bi bi-play-fill"></i> 立即运行
+                <i class="bi bi-play-fill"></i> Chạy ngay
             </button>
         </form>
         <a href="{{ url_for('youtube_monitor_config_edit', config_id=config.id) }}" class="btn btn-warning">
-            <i class="bi bi-pencil"></i> 编辑配置
+            <i class="bi bi-pencil"></i> Chỉnh sửa cấu hình
         </a>
         {% if history %}
-        <form method="POST" action="{{ url_for('youtube_monitor_clear_history', config_id=config.id) }}" class="d-inline" onsubmit="return confirm('确定要清除该配置的所有历史记录吗？此操作不可恢复！')">
+        <form method="POST" action="{{ url_for('youtube_monitor_clear_history', config_id=config.id) }}" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa tất cả lịch sử của cấu hình này? Thao tác này không thể khôi phục!')">
             <button type="submit" class="btn btn-danger">
-                <i class="bi bi-trash"></i> 清除历史记录
+                <i class="bi bi-trash"></i> Xóa lịch sử
             </button>
         </form>
         {% endif %}
     </div>
 </div>
 
-<!-- 监控历史列表 -->
+<!-- Danh sách lịch sử giám sát -->
 {% if history %}
 <div class="table-responsive">
     <table class="table table-striped">
         <thead class="table-dark">
             <tr>
-                <th>时间</th>
-                <th>视频标题</th>
-                <th>频道</th>
-                <th>观看数</th>
-                <th>点赞数</th>
-                <th>评论数</th>
-                <th>时长</th>
-                <th>发布时间</th>
-                <th>状态</th>
-                <th>操作</th>
+                <th>Thời gian</th>
+                <th>Tiêu đề video</th>
+                <th>Kênh</th>
+                <th>Lượt xem</th>
+                <th>Lượt thích</th>
+                <th>Lượt bình luận</th>
+                <th>Thời lượng</th>
+                <th>Thời gian đăng</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
@@ -148,9 +148,9 @@
                     <div class="text-truncate-300" title="{{ record.video_title }}">
                         {% if record.video_type %}
                             {% if record.video_type == 'short' %}
-                                <span class="badge bg-info text-dark" title="短视频">短</span>
+                                <span class="badge bg-info text-dark" title="Video ngắn">Ngắn</span>
                             {% elif record.video_type == 'live' %}
-                                <span class="badge bg-danger" title="直播">直播</span>
+                                <span class="badge bg-danger" title="Trực tiếp">Trực tiếp</span>
                             {% endif %}
                         {% endif %}
                         {{ record.video_title }}
@@ -184,21 +184,21 @@
                 </td>
                 <td>
                     {% if record.added_to_tasks %}
-                    <span class="badge bg-success">已添加</span>
+                    <span class="badge bg-success">Đã thêm</span>
                     {% else %}
-                    <span class="badge bg-secondary">未添加</span>
+                    <span class="badge bg-secondary">Chưa thêm</span>
                     {% endif %}
                 </td>
                 <td>
                     <div class="btn-group" role="group">
                         <a href="https://www.youtube.com/watch?v={{ record.video_id }}" 
-                           target="_blank" rel="noopener" class="btn btn-outline-danger btn-sm" title="在YouTube中查看">
+                           target="_blank" rel="noopener" class="btn btn-outline-danger btn-sm" title="Xem trên YouTube">
                             <i class="bi bi-youtube"></i>
                         </a>
                         {% if not record.added_to_tasks %}
                         <button type="button" class="btn btn-outline-success btn-sm" 
                                 onclick="addToTasks('{{ record.video_id }}', '{{ config.id }}')" 
-                                title="添加到任务队列">
+                                title="Thêm vào hàng đợi nhiệm vụ">
                             <i class="bi bi-plus-circle"></i>
                         </button>
                         {% endif %}
@@ -210,13 +210,13 @@
     </table>
 </div>
 
-<!-- 统计信息 -->
+<!-- Thông tin thống kê -->
 <div class="row mt-4">
     <div class="col-md-3">
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">{{ stats.total_records }}</h5>
-                <p class="card-text">总记录数</p>
+                <p class="card-text">Tổng số bản ghi</p>
             </div>
         </div>
     </div>
@@ -224,7 +224,7 @@
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">{{ stats.added_to_tasks }}</h5>
-                <p class="card-text">已添加到任务</p>
+                <p class="card-text">Đã thêm vào nhiệm vụ</p>
             </div>
         </div>
     </div>
@@ -232,7 +232,7 @@
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">{{ stats.avg_views }}</h5>
-                <p class="card-text">平均观看数</p>
+                <p class="card-text">Lượt xem trung bình</p>
             </div>
         </div>
     </div>
@@ -240,7 +240,7 @@
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">{{ stats.avg_likes }}</h5>
-                <p class="card-text">平均点赞数</p>
+                <p class="card-text">Lượt thích trung bình</p>
             </div>
         </div>
     </div>
@@ -248,9 +248,9 @@
 
 {% else %}
 <div class="alert alert-info">
-    <i class="bi bi-info-circle"></i> 此配置还没有监控记录。
+    <i class="bi bi-info-circle"></i> Cấu hình này chưa có bản ghi giám sát nào.
     <form method="POST" action="{{ url_for('youtube_monitor_run', config_id=config.id) }}" class="d-inline monitor-run-form">
-        <button type="submit" class="btn btn-link p-0">点击这里立即运行一次监控</button>
+        <button type="submit" class="btn btn-link p-0">Bấm vào đây để chạy giám sát ngay một lần</button>
     </form>
 </div>
 {% endif %}
@@ -289,15 +289,15 @@ function bindMonitorRunForms() {
             })
             .then((response) => {
                 return response.json().catch(() => {
-                    throw new Error('启动监控失败：响应不是有效的 JSON，请刷新页面后重试。');
+                    throw new Error('Khởi động giám sát thất bại: phản hồi không phải JSON hợp lệ, vui lòng làm mới trang rồi thử lại.');
                 }).then((data) => ({ ok: response.ok, data }));
             })
             .then(({ ok, data }) => {
                 if (!ok || !data.success || !data.operation_id) {
-                    throw new Error((data && data.message) ? data.message : '启动监控失败');
+                    throw new Error((data && data.message) ? data.message : 'Khởi động giám sát thất bại');
                 }
 
-                showAlert('info', data.message || '监控已在后台启动');
+                showAlert('info', data.message || 'Giám sát đã khởi động trong nền');
                 const statusUrl = monitorRunStatusEndpointTemplate.replace('__operation_id__', encodeURIComponent(data.operation_id));
                 const pollTimer = window.setInterval(() => {
                     fetch(statusUrl, {
@@ -306,12 +306,12 @@ function bindMonitorRunForms() {
                     })
                     .then((response) => {
                         return response.json().catch(() => {
-                            throw new Error('监控状态查询失败：响应不是有效的 JSON。');
+                            throw new Error('Truy vấn trạng thái giám sát thất bại: phản hồi không phải JSON hợp lệ.');
                         }).then((payload) => ({ ok: response.ok, payload }));
                     })
                     .then(({ ok, payload }) => {
                         if (!ok || !payload || payload.found === false) {
-                            throw new Error('监控状态不存在或已过期，请刷新页面后查看结果。');
+                            throw new Error('Trạng thái giám sát không tồn tại hoặc đã hết hạn, vui lòng làm mới trang để xem kết quả.');
                         }
 
                         if (!payload.done) {
@@ -321,34 +321,34 @@ function bindMonitorRunForms() {
                         window.clearInterval(pollTimer);
                         if (payload.success) {
                             button.innerHTML = '<i class="bi bi-check2"></i>';
-                            showAlert('success', payload.message || '监控执行完成');
+                            showAlert('success', payload.message || 'Giám sát đã chạy xong');
                             window.setTimeout(() => window.location.reload(), 900);
                             return;
                         }
 
                         button.disabled = false;
                         button.innerHTML = originalHtml;
-                        showAlert('danger', payload.message || '监控执行失败');
+                        showAlert('danger', payload.message || 'Giám sát chạy thất bại');
                     })
                     .catch((error) => {
                         window.clearInterval(pollTimer);
                         button.disabled = false;
                         button.innerHTML = originalHtml;
-                        showAlert('danger', error.message || '查询监控状态失败，请重试');
+                        showAlert('danger', error.message || 'Truy vấn trạng thái giám sát thất bại, vui lòng thử lại');
                     });
                 }, 1000);
             })
             .catch((error) => {
                 button.disabled = false;
                 button.innerHTML = originalHtml;
-                showAlert('danger', error.message || '启动监控失败，请重试');
+                showAlert('danger', error.message || 'Khởi động giám sát thất bại, vui lòng thử lại');
             });
         });
     });
 }
 
 function addToTasks(videoId, configId) {
-    if (!confirm('确定要将此视频添加到任务队列吗？')) {
+    if (!confirm('Bạn có chắc muốn thêm video này vào hàng đợi nhiệm vụ không?')) {
         return;
     }
     
@@ -370,15 +370,15 @@ function addToTasks(videoId, configId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // 成功后隐藏按钮并更新状态
+            // Sau khi thành công thì ẩn nút và cập nhật trạng thái
             button.style.display = 'none';
             const statusCell = button.closest('tr').querySelector('td:nth-last-child(2)');
-            statusCell.innerHTML = '<span class="badge bg-success">已添加</span>';
+            statusCell.innerHTML = '<span class="badge bg-success">Đã thêm</span>';
             
-            // 显示成功消息
+            // Hiển thị thông báo thành công
             showAlert('success', data.message);
         } else {
-            // 失败后恢复按钮
+            // Sau khi thất bại thì khôi phục nút
             button.disabled = false;
             button.innerHTML = originalHtml;
             showAlert('danger', data.message);
@@ -388,7 +388,7 @@ function addToTasks(videoId, configId) {
         console.error('Error:', error);
         button.disabled = false;
         button.innerHTML = originalHtml;
-        showAlert('danger', '操作失败，请重试');
+        showAlert('danger', 'Thao tác thất bại, vui lòng thử lại');
     });
 }
 
@@ -403,7 +403,7 @@ function showAlert(type, message) {
     const container = document.querySelector('.container-fluid');
     container.insertBefore(alertDiv, container.firstChild);
     
-    // 3秒后自动消失
+    // Tự biến mất sau 3 giây
     setTimeout(() => {
         if (alertDiv.parentNode) {
             alertDiv.remove();

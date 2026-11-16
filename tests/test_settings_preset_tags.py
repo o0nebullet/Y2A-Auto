@@ -109,7 +109,7 @@ class PresetTagsSettingsSaveTests(_SettingsSaveTestCase):
         self.assertEqual(result['updated_config']['PRESET_TAGS'], '')
         warnings = self._warnings(result)
         self.assertEqual(len(warnings), 1, warnings)
-        self.assertIn('等同于未启用', warnings[0])
+        self.assertIn('tương đương chưa bật', warnings[0])
 
     def test_未提交预设键时不改动已有配置(self):
         self._save({'PRESET_TAGS_ENABLED': 'on', 'PRESET_TAGS': 'ASMR'})

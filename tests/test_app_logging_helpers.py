@@ -24,15 +24,15 @@ class AppLoggingHelperTests(unittest.TestCase):
 
         self.assertEqual(
             describe_status("direct_ready"),
-            "YouTube API 初始化成功，当前为直连模式"
+            "YouTube API khởi tạo thành công, hiện đang ở chế độ kết nối trực tiếp"
         )
         self.assertEqual(
             describe_status("proxy_ready"),
-            "YouTube API 初始化成功，独立代理已启用"
+            "YouTube API khởi tạo thành công, proxy riêng đã được bật"
         )
         self.assertEqual(
             describe_status("init_failed"),
-            "YouTube监控 API 初始化失败，请检查 API 密钥、代理配置与网络连通性。"
+            "Khởi tạo YouTube API giám sát thất bại, vui lòng kiểm tra API Key, cấu hình proxy và kết nối mạng."
         )
 
     def test_startup_config_summary_contains_only_booleans_for_sensitive_fields(self):
@@ -117,7 +117,7 @@ class AppLoggingHelperTests(unittest.TestCase):
 
         message = build_message("数据库")
 
-        self.assertEqual(message, "数据库检查失败，请查看服务日志。")
+        self.assertEqual(message, "数据库 kiểm tra thất bại, vui lòng xem nhật ký dịch vụ.")
         self.assertNotIn("Traceback", message)
         self.assertNotIn("Exception", message)
 

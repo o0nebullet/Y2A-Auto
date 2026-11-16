@@ -136,12 +136,12 @@ def _save_security_state(state):
 
 def _describe_youtube_api_status(status_code: str) -> str:
     messages = {
-        'direct_ready': 'YouTube API 初始化成功，当前为直连模式',
-        'proxy_ready': 'YouTube API 初始化成功，独立代理已启用',
-        'missing_api_key': 'YouTube API 密钥未配置，请先在设置页完成接入。',
-        'init_failed': 'YouTube监控 API 初始化失败，请检查 API 密钥、代理配置与网络连通性。',
+        'direct_ready': 'YouTube API khởi tạo thành công, hiện đang ở chế độ kết nối trực tiếp',
+        'proxy_ready': 'YouTube API khởi tạo thành công, proxy riêng đã được bật',
+        'missing_api_key': 'Chưa cấu hình YouTube API Key, vui lòng hoàn tất kết nối tại trang cài đặt.',
+        'init_failed': 'Khởi tạo YouTube API giám sát thất bại, vui lòng kiểm tra API Key, cấu hình proxy và kết nối mạng.',
     }
-    return messages.get(status_code, 'YouTube监控 API 状态未知，请检查设置。')
+    return messages.get(status_code, 'Trạng thái YouTube API giám sát không xác định, vui lòng kiểm tra cài đặt.')
 
 
 def _build_startup_config_log_summary(config: dict | None) -> dict:
@@ -184,7 +184,7 @@ def _append_notification_config_warnings(messages: list, config: dict | None):
             _append_settings_message(
                 messages,
                 'warning',
-                f'已启用 {channel_label} 通知，但缺少配置：{readable_fields}。该渠道会暂时跳过发送。'
+                f'Đã bật thông báo {channel_label} nhưng thiếu cấu hình: {readable_fields}. Kênh này sẽ tạm thời bị bỏ qua khi gửi.'
             )
 
 
@@ -226,10 +226,10 @@ def _merge_cookiecloud_runtime_settings(payload: dict | None, base_config: dict 
 def _cookiecloud_operation_error_message(action: str, retry_later: bool = False) -> str:
     action_key = str(action or '').strip().lower()
     if action_key == 'test':
-        return 'CookieCloud 连接测试失败，请稍后重试。' if retry_later else 'CookieCloud 连接测试失败，请检查配置后重试。'
+        return 'Kiểm tra kết nối CookieCloud thất bại, vui lòng thử lại sau.' if retry_later else 'Kiểm tra kết nối CookieCloud thất bại, vui lòng kiểm tra cấu hình rồi thử lại.'
     if action_key == 'sync':
-        return 'CookieCloud 立即拉取失败，请稍后重试。' if retry_later else 'CookieCloud 立即拉取失败，请检查配置后重试。'
-    return 'CookieCloud 操作失败，请稍后重试。' if retry_later else 'CookieCloud 操作失败，请检查配置后重试。'
+        return 'Kéo CookieCloud ngay thất bại, vui lòng thử lại sau.' if retry_later else 'Kéo CookieCloud ngay thất bại, vui lòng kiểm tra cấu hình rồi thử lại.'
+    return 'Thao tác CookieCloud thất bại, vui lòng thử lại sau.' if retry_later else 'Thao tác CookieCloud thất bại, vui lòng kiểm tra cấu hình rồi thử lại.'
 
 
 def _remember_cookiecloud_sync_result(success: bool, message: str):
@@ -358,7 +358,7 @@ def _emit_qr_login_event_once(
         EVENT_QR_LOGIN_SUCCESS if is_success else EVENT_QR_LOGIN_FAILED,
         {
             'platform': platform,
-            'message': str((status_data or {}).get('message') or ('Cookies 已保存' if is_success else '登录失败')).strip(),
+            'message': str((status_data or {}).get('message') or ('Đã lưu Cookies' if is_success else 'Đăng nhập thất bại')).strip(),
         }
     )
 
@@ -376,8 +376,8 @@ def _new_settings_save_state(operation_id: str) -> dict:
     return {
         'operation_id': operation_id,
         'stage': 'saving_config',
-        'message': '正在准备保存设置',
-        'detail': '正在提交保存任务，请稍候。',
+        'message': 'Đang chuẩn bị lưu cài đặt',
+        'detail': 'Đang gửi nhiệm vụ lưu, vui lòng chờ.',
         'percent': None,
         'downloaded_bytes': None,
         'total_bytes': None,
@@ -427,8 +427,8 @@ def _new_monitor_run_state(operation_id: str, config_id: int) -> dict:
     return {
         'operation_id': operation_id,
         'config_id': config_id,
-        'message': '监控任务已创建',
-        'detail': '正在后台执行 YouTube 监控，请稍候。',
+        'message': 'Đã tạo nhiệm vụ giám sát',
+        'detail': 'Đang chạy giám sát YouTube trong nền, vui lòng chờ.',
         'done': False,
         'level': 'info',
         'success': None,
@@ -488,23 +488,23 @@ def _run_monitor_operation(operation_id: str, config_id: int):
     except Exception as exc:
         logger.exception("后台执行 YouTube 监控失败，配置ID: %s", config_id)
         success = False
-        message = f"监控失败: {exc}"
+        message = f"Giám sát thất bại: {exc}"
 
-    detail = '监控记录已更新，可刷新页面查看最新结果。' if success else message
+    detail = 'Đã cập nhật bản ghi giám sát, có thể làm mới trang để xem kết quả mới nhất.' if success else message
     _finalize_monitor_run_operation(operation_id, config_id, success, message, detail)
 
 
 def _start_monitor_run_operation(config_id: int):
     config = youtube_monitor.get_monitor_config(config_id)
     if not config:
-        return None, None, "监控配置不存在"
+        return None, None, "Cấu hình giám sát không tồn tại"
 
     operation_id = str(uuid.uuid4())
     _update_monitor_run_progress(
         operation_id,
         config_id,
-        message=f"已启动监控任务：{config['name']}",
-        detail='正在后台执行 YouTube 监控，请稍候。',
+        message=f"Đã khởi động nhiệm vụ giám sát: {config['name']}",
+        detail='Đang chạy giám sát YouTube trong nền, vui lòng chờ.',
         done=False,
         level='info',
         success=None,
@@ -532,14 +532,14 @@ def _get_task_dir_real(task_id: str) -> str:
     try:
         normalized_task_id = str(uuid.UUID(str(task_id or '').strip()))
     except (AttributeError, TypeError, ValueError) as exc:
-        raise ValueError('非法任务目录') from exc
+        raise ValueError('Thư mục nhiệm vụ không hợp lệ') from exc
 
     safe_task_dir = safe_join(downloads_dir_real, normalized_task_id)
     if not safe_task_dir:
-        raise ValueError('非法任务目录')
+        raise ValueError('Thư mục nhiệm vụ không hợp lệ')
     task_dir_real = os.path.realpath(safe_task_dir)
     if os.path.commonpath([downloads_dir_real, task_dir_real]) != downloads_dir_real:
-        raise ValueError('非法任务目录')
+        raise ValueError('Thư mục nhiệm vụ không hợp lệ')
     return task_dir_real
 
 
@@ -572,18 +572,18 @@ def _get_cover_file_info(path: str):
 
 def _validate_cover_upload(file_storage):
     if not file_storage or not getattr(file_storage, 'filename', ''):
-        raise ValueError('请选择要上传的封面图片')
+        raise ValueError('Vui lòng chọn ảnh bìa cần tải lên')
 
     ext, _ = _get_cover_file_info(file_storage.filename)
     if ext not in ALLOWED_COVER_EXTENSIONS:
-        raise ValueError('仅支持 JPG、JPEG、PNG、WEBP 格式的封面图片')
+        raise ValueError('Chỉ hỗ trợ ảnh bìa định dạng JPG, JPEG, PNG, WEBP')
 
     current_pos = file_storage.stream.tell()
     try:
         with Image.open(file_storage.stream) as img:
             img.verify()
     except (UnidentifiedImageError, OSError, ValueError) as exc:
-        raise ValueError(f'上传文件不是有效图片: {exc}') from exc
+        raise ValueError(f'Tệp tải lên không phải ảnh hợp lệ: {exc}') from exc
     finally:
         file_storage.stream.seek(current_pos)
 
@@ -626,7 +626,7 @@ def _get_current_cover_path(task: dict, task_dir_real: str):
 def _replace_task_cover(task: dict, uploaded_file):
     task_id = str(task.get('id') or '').strip()
     if not task_id:
-        raise ValueError('任务不存在')
+        raise ValueError('Nhiệm vụ không tồn tại')
 
     task_dir_real = _get_task_dir_real(task_id)
     os.makedirs(task_dir_real, exist_ok=True)
@@ -639,10 +639,10 @@ def _replace_task_cover(task: dict, uploaded_file):
     if not original_backup and current_cover_path:
         current_ext, _ = _get_cover_file_info(current_cover_path)
         if current_ext not in ALLOWED_COVER_EXTENSIONS:
-            raise ValueError('当前原始封面格式不受支持，无法创建恢复备份')
+            raise ValueError('Định dạng ảnh bìa gốc hiện tại không được hỗ trợ, không thể tạo bản sao lưu khôi phục')
         original_backup = _safe_join_task_dir(task_dir_real, f'original_cover{current_ext}')
         if not original_backup:
-            raise ValueError('无法创建原始封面备份路径')
+            raise ValueError('Không thể tạo đường dẫn sao lưu ảnh bìa gốc')
         shutil.copy2(current_cover_path, original_backup)
 
     for existing_ext in ALLOWED_COVER_EXTENSIONS:
@@ -652,7 +652,7 @@ def _replace_task_cover(task: dict, uploaded_file):
 
     new_cover_path = _safe_join_task_dir(task_dir_real, f'custom_cover{ext}')
     if not new_cover_path:
-        raise ValueError('无法创建封面保存路径')
+        raise ValueError('Không thể tạo đường dẫn lưu ảnh bìa')
     uploaded_file.save(new_cover_path)
     update_task(task_id, cover_path_local=new_cover_path, silent=True)
     return new_cover_path
@@ -661,15 +661,15 @@ def _replace_task_cover(task: dict, uploaded_file):
 def _restore_task_cover(task: dict):
     task_id = str(task.get('id') or '').strip()
     if not task_id:
-        raise ValueError('任务不存在')
+        raise ValueError('Nhiệm vụ không tồn tại')
 
     task_dir_real = _get_task_dir_real(task_id)
     if not os.path.isdir(task_dir_real):
-        raise ValueError('任务目录不存在，无法恢复原封面')
+        raise ValueError('Thư mục nhiệm vụ không tồn tại, không thể khôi phục ảnh bìa gốc')
 
     original_backup = _find_original_cover_backup(task_dir_real)
     if not original_backup:
-        raise ValueError('未找到原始封面备份，无法恢复')
+        raise ValueError('Không tìm thấy bản sao lưu ảnh bìa gốc, không thể khôi phục')
 
     update_task(task_id, cover_path_local=original_backup, silent=True)
     return original_backup
@@ -863,37 +863,37 @@ SETTINGS_RANGE_GUARDS = (
     ('VIDEO_QUALITY_VALUE', 0.0, 51.0),
 )
 
-# 回退提示里的中文名称（取自设置页控件文案），仅用于让用户看懂被改了哪一项。
+# 回退提示里的名称（取自设置页控件文案），仅用于让用户看懂被改了哪一项。
 SETTINGS_GUARD_LABELS = {
-    'VAD_MAX_SEGMENT_S': '最大片段（秒）',
-    'AUDIO_CHUNK_WINDOW_S': '分片窗口（秒）',
-    'AUDIO_CHUNK_OVERLAP_S': '分片重叠（秒）',
-    'VAD_MIN_SEGMENT_S': '最短语音段（秒）',
-    'VAD_MERGE_GAP_S': '语音段合并间隔（秒）',
-    'VAD_MAX_SEGMENT_S_FOR_SPLIT': '切片上限（秒）',
-    'VAD_MIN_SPEECH_COVERAGE_RATIO': '最低语音覆盖率',
-    'SUBTITLE_MAX_LINE_LENGTH': '每行最大字符数',
-    'SUBTITLE_MAX_LINES': '最大行数',
-    'SUBTITLE_MAX_CUE_DURATION_S': '单条字幕最长时长（秒）',
-    'SUBTITLE_MAX_CPS': '字幕最大每秒字符数',
-    'SUBTITLE_TRANSLATION_MAX_CHARS_PER_BATCH': '翻译单批最大字符数',
-    'WHISPER_TEMPERATURE': 'Whisper 解码温度',
-    'WHISPER_NO_SPEECH_THRESHOLD': 'Whisper 无语音判定阈值',
-    'SUBTITLE_QC_MIN_COVERAGE_RATIO': '质检最低覆盖率',
-    'SUBTITLE_QC_MAX_GAP_S': '质检最大空档（秒）',
-    'SUBTITLE_QC_MAX_CPS': '质检最大每秒字符数',
-    'AI_FAILOVER_TIMEOUT_SECONDS': 'AI 故障转移超时（秒）',
-    'SUBTITLE_QC_TIMEOUT_SECONDS': '字幕质检接口超时（秒）',
-    'SUBTITLE_MAX_LINE_LENGTH_ENABLED': '每行最大字符数开关',
-    'SUBTITLE_MAX_LINES_ENABLED': '最大行数开关',
+    'VAD_MAX_SEGMENT_S': 'Đoạn dài nhất (giây)',
+    'AUDIO_CHUNK_WINDOW_S': 'Cửa sổ phân đoạn (giây)',
+    'AUDIO_CHUNK_OVERLAP_S': 'Chồng lấn phân đoạn (giây)',
+    'VAD_MIN_SEGMENT_S': 'Đoạn giọng nói ngắn nhất (giây)',
+    'VAD_MERGE_GAP_S': 'Khoảng gộp đoạn giọng nói (giây)',
+    'VAD_MAX_SEGMENT_S_FOR_SPLIT': 'Giới hạn cắt lát (giây)',
+    'VAD_MIN_SPEECH_COVERAGE_RATIO': 'Tỷ lệ bao phủ giọng nói tối thiểu',
+    'SUBTITLE_MAX_LINE_LENGTH': 'Số ký tự tối đa mỗi dòng',
+    'SUBTITLE_MAX_LINES': 'Số dòng tối đa',
+    'SUBTITLE_MAX_CUE_DURATION_S': 'Thời lượng dài nhất mỗi phụ đề (giây)',
+    'SUBTITLE_MAX_CPS': 'Số ký tự tối đa mỗi giây của phụ đề',
+    'SUBTITLE_TRANSLATION_MAX_CHARS_PER_BATCH': 'Số ký tự tối đa mỗi lô dịch',
+    'WHISPER_TEMPERATURE': 'Nhiệt độ giải mã Whisper',
+    'WHISPER_NO_SPEECH_THRESHOLD': 'Ngưỡng xác định không có giọng nói Whisper',
+    'SUBTITLE_QC_MIN_COVERAGE_RATIO': 'Tỷ lệ bao phủ tối thiểu kiểm tra chất lượng',
+    'SUBTITLE_QC_MAX_GAP_S': 'Khoảng trống tối đa kiểm tra chất lượng (giây)',
+    'SUBTITLE_QC_MAX_CPS': 'Số ký tự tối đa mỗi giây kiểm tra chất lượng',
+    'AI_FAILOVER_TIMEOUT_SECONDS': 'Thời gian chờ chuyển đổi dự phòng AI (giây)',
+    'SUBTITLE_QC_TIMEOUT_SECONDS': 'Thời gian chờ API kiểm tra chất lượng phụ đề (giây)',
+    'SUBTITLE_MAX_LINE_LENGTH_ENABLED': 'Công tắc số ký tự tối đa mỗi dòng',
+    'SUBTITLE_MAX_LINES_ENABLED': 'Công tắc số dòng tối đa',
     # 烧录字幕外观（倍率型）
-    'SUBTITLE_FONT_SIZE_SCALE': '字幕字号倍率',
-    'SUBTITLE_MARGIN_V_SCALE': '字幕垂直边距倍率',
-    'SUBTITLE_OUTLINE_SCALE': '字幕描边倍率',
-    'SUBTITLE_SHADOW_SCALE': '字幕阴影倍率',
-    'SUBTITLE_BACKGROUND_OPACITY': '字幕背景不透明度',
+    'SUBTITLE_FONT_SIZE_SCALE': 'Tỷ lệ cỡ chữ phụ đề',
+    'SUBTITLE_MARGIN_V_SCALE': 'Tỷ lệ lề dọc phụ đề',
+    'SUBTITLE_OUTLINE_SCALE': 'Tỷ lệ viền chữ phụ đề',
+    'SUBTITLE_SHADOW_SCALE': 'Tỷ lệ bóng chữ phụ đề',
+    'SUBTITLE_BACKGROUND_OPACITY': 'Độ mờ nền phụ đề',
     # 编码质量
-    'VIDEO_QUALITY_VALUE': '画质数值（CRF/CQ/QP）',
+    'VIDEO_QUALITY_VALUE': 'Giá trị chất lượng hình ảnh (CRF/CQ/QP)',
 }
 
 
@@ -938,22 +938,22 @@ def _guard_bounds(key):
 def _format_settings_revert_message(reverts: list) -> str:
     """汇总本轮回退项，生成用户可见的提示文本。
 
-    每条包含：中文名（配置键）、提交值、最终生效值、允许范围 / 交叉约束说明。
+    每条包含：名称（配置键）、提交值、最终生效值、允许范围 / 交叉约束说明。
     """
     parts = []
     for item in reverts:
         key = str(item.get('key') or '')
         label = SETTINGS_GUARD_LABELS.get(key, key)
         prefix = key if label == key else f'{label}（{key}）'
-        text = f'{prefix}：提交 {item.get("submitted")} → 生效 {item.get("applied")}'
+        text = f'{prefix}：Đã gửi {item.get("submitted")} → Có hiệu lực {item.get("applied")}'
         if item.get('allowed'):
-            text += f'，允许 {item["allowed"]}'
+            text += f', cho phép {item["allowed"]}'
         if item.get('note'):
             text += f'；{item["note"]}'
         parts.append(text)
     if not parts:
         return ''
-    return '以下设置项超出允许范围，已回退后再保存：' + '；'.join(parts) + '。'
+    return 'Các mục cài đặt sau vượt quá phạm vi cho phép, đã khôi phục về mặc định rồi lưu: ' + '; '.join(parts) + '.'
 
 
 def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | None = None) -> dict:
@@ -976,7 +976,7 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
         })
 
     try:
-        report('saving_config', '正在保存配置', '正在校验并写入设置。')
+        report('saving_config', 'Đang lưu cấu hình', 'Đang kiểm tra và ghi cài đặt.')
         form_data.pop('save_operation_id', None)
 
         # 本轮回退记录：键 / 提交值 / 生效值 / 允许范围。所有「值被改掉」的分支都要登记，
@@ -1012,7 +1012,7 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
             if new_password == confirm_password:
                 form_data['password'] = new_password
             else:
-                _append_settings_message(messages, 'danger', '新密码两次输入不一致，密码未更新。')
+                _append_settings_message(messages, 'danger', 'Mật khẩu mới nhập hai lần không khớp, mật khẩu chưa được cập nhật.')
 
         form_data.pop('new_password', None)
         form_data.pop('confirm_password', None)
@@ -1043,7 +1043,7 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
                         remember_revert(
                             field, _submitted_int, form_data[field],
                             allowed=_format_guard_range(*_guard_bounds(field)),
-                            note='不是有效数值',
+                            note='Không phải giá trị hợp lệ',
                         )
 
         # AI_FAILOVER_TIMEOUT_SECONDS 范围校验：设置页声明 1–60 秒。
@@ -1097,7 +1097,7 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
                         remember_revert(
                             field, _submitted_float, form_data[field],
                             allowed=_format_guard_range(*_guard_bounds(field)),
-                            note='不是有效数值',
+                            note='Không phải giá trị hợp lệ',
                         )
 
         # 表单可达数值键的范围校验 + 无控件数值键的防御性校验（表见 SETTINGS_RANGE_GUARDS）。
@@ -1177,7 +1177,7 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
             remember_revert(
                 _overlap_key, _submitted_overlap, form_data[_overlap_key],
                 allowed=f'0–{_format_guard_bound(_overlap_limit)}',
-                note=f'须小于分片窗口 {_format_guard_bound(_window_value)}',
+                note=f'Phải nhỏ hơn cửa sổ phân đoạn {_format_guard_bound(_window_value)}',
             )
 
         # 旧模板把字幕换行上限钉死为 999/1 且强制两个开关为 on（当时控件是 disabled，
@@ -1204,7 +1204,7 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
                 )
                 remember_revert(
                     _wrap_key, _submitted_wrap, form_data[_wrap_key],
-                    note='旧模板钉死的字幕换行组合，整组回退为默认值',
+                    note='Tổ hợp ngắt dòng phụ đề bị mẫu cũ cố định, cả nhóm đã khôi phục về mặc định',
                 )
 
         if 'SUBTITLE_FONT_NAME' in form_data:
@@ -1249,7 +1249,7 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
             if not _preset_text and is_preset_tags_enabled(form_data):
                 _append_settings_message(
                     messages, 'warning',
-                    '已勾选「使用预设标签」但没有填写任何标签，当前等同于未启用。'
+                    'Đã tích "Dùng thẻ tag đặt trước" nhưng chưa nhập thẻ tag nào, hiện tương đương chưa bật.'
                 )
 
         _persist_settings_uploads(form_data, uploads)
@@ -1276,7 +1276,7 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
             if need_ffmpeg:
                 from modules.ffmpeg_manager import get_windows_ffmpeg_manual_setup_message
                 from modules.youtube_handler import get_ffmpeg_path
-                report('checking_ffmpeg', '正在检查 FFmpeg', '已启用依赖 FFmpeg 的功能，正在检查本地环境。')
+                report('checking_ffmpeg', 'Đang kiểm tra FFmpeg', 'Đã bật tính năng cần FFmpeg, đang kiểm tra môi trường máy.')
                 ff_path = get_ffmpeg_path(
                     logger=logger,
                     force_refresh=True,
@@ -1284,20 +1284,20 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
                 )
                 if ff_path and os.path.exists(ff_path):
                     logger.info(f"FFmpeg 已就绪: {ff_path}")
-                    report('completed', 'FFmpeg 已就绪', ff_path, percent=100.0, level='success')
+                    report('completed', 'FFmpeg đã sẵn sàng', ff_path, percent=100.0, level='success')
                 else:
                     warning_msg = get_windows_ffmpeg_manual_setup_message()
                     logger.warning(warning_msg)
                     _append_settings_message(messages, 'warning', warning_msg)
-                    report('warning', 'FFmpeg 未就绪', warning_msg, level='warning')
+                    report('warning', 'FFmpeg chưa sẵn sàng', warning_msg, level='warning')
             else:
-                report('completed', '配置已保存', '当前设置不需要额外下载 FFmpeg。', percent=100.0, level='success')
+                report('completed', 'Đã lưu cấu hình', 'Cài đặt hiện tại không cần tải thêm FFmpeg.', percent=100.0, level='success')
         except Exception as e:
             from modules.ffmpeg_manager import get_windows_ffmpeg_manual_setup_message
-            warning_msg = f'检查内置 FFmpeg 状态失败，请查看服务日志。{get_windows_ffmpeg_manual_setup_message()}'
+            warning_msg = f'Kiểm tra trạng thái FFmpeg tích hợp thất bại, vui lòng xem nhật ký dịch vụ. {get_windows_ffmpeg_manual_setup_message()}'
             logger.warning("检查内置 FFmpeg 状态失败: %s", e)
             _append_settings_message(messages, 'warning', warning_msg)
-            report('warning', 'FFmpeg 检查失败', warning_msg, level='warning')
+            report('warning', 'Kiểm tra FFmpeg thất bại', warning_msg, level='warning')
 
         api_key = str(updated_config.get('YOUTUBE_API_KEY') or '').strip()
         api_ready, api_status = youtube_monitor.reload_api_client(updated_config)
@@ -1311,9 +1311,9 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
             else:
                 youtube_monitor.stop_all_schedules()
                 if api_status == 'missing_api_key':
-                    warning_msg = 'YouTube API 密钥未配置，请先在设置页完成接入。'
+                    warning_msg = 'Chưa cấu hình YouTube API Key, vui lòng hoàn tất kết nối tại trang cài đặt.'
                 else:
-                    warning_msg = 'YouTube监控 API 初始化失败，请检查 API 密钥、代理配置与网络连通性。'
+                    warning_msg = 'Khởi tạo YouTube API giám sát thất bại, vui lòng kiểm tra API Key, cấu hình proxy và kết nối mạng.'
                 logger.warning(warning_msg)
                 _append_settings_message(messages, 'warning', warning_msg)
         else:
@@ -1324,17 +1324,17 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
         if str(updated_config.get('COOKIECLOUD_ENABLED', False)).lower() in ('true', '1', 'on'):
             _cookiecloud_missing = []
             if not str(updated_config.get('COOKIECLOUD_SERVER_URL', '') or '').strip():
-                _cookiecloud_missing.append('服务地址')
+                _cookiecloud_missing.append('Địa chỉ dịch vụ')
             if not str(updated_config.get('COOKIECLOUD_UUID', '') or '').strip():
                 _cookiecloud_missing.append('UUID')
             if not str(updated_config.get('COOKIECLOUD_PASSWORD', '') or '').strip():
-                _cookiecloud_missing.append('密码')
+                _cookiecloud_missing.append('Mật khẩu')
             if _cookiecloud_missing:
                 _append_settings_message(
                     messages, 'warning',
-                    f'CookieCloud 已启用，但以下必填项为空：{"、".join(_cookiecloud_missing)}。'
-                    'CookieCloud 需要服务地址、UUID、密码三者均非空才能正常同步，'
-                    '请补全后保存，或暂时关闭 CookieCloud。'
+                    f'CookieCloud đã bật nhưng các mục bắt buộc sau đang trống: {", ".join(_cookiecloud_missing)}.'
+                    'CookieCloud cần địa chỉ dịch vụ, UUID và mật khẩu đều không trống mới đồng bộ bình thường,'
+                    'Vui lòng bổ sung rồi lưu, hoặc tạm thời tắt CookieCloud.'
                 )
 
         # 值被回退过就必须让用户看见：放在 success 之前，保存本身的成功语义不变
@@ -1344,11 +1344,11 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
             logger.warning('设置保存时回退了越界值: %s', _revert_message)
             _append_settings_message(messages, 'warning', _revert_message)
 
-        _append_settings_message(messages, 'success', '配置已成功保存')
+        _append_settings_message(messages, 'success', 'Đã lưu cấu hình thành công')
         final_level = 'warning' if any(msg['category'] in ('warning', 'danger') for msg in messages) else 'success'
         final_stage = 'warning' if final_level == 'warning' else 'completed'
-        final_message = '配置已保存，但有提醒需要处理。' if final_level == 'warning' else '配置已成功保存'
-        final_detail = next((msg['text'] for msg in messages if msg['category'] in ('warning', 'danger')), '设置已生效。')
+        final_message = 'Đã lưu cấu hình, nhưng có lưu ý cần xử lý.' if final_level == 'warning' else 'Đã lưu cấu hình thành công'
+        final_detail = next((msg['text'] for msg in messages if msg['category'] in ('warning', 'danger')), 'Cài đặt đã có hiệu lực.')
         return {
             'success': True,
             'messages': messages,
@@ -1360,14 +1360,14 @@ def _perform_settings_save(form_data: dict, uploads: dict, operation_id: str | N
         }
     except Exception as e:
         logger.exception("保存设置失败: %s", e)
-        public_message = '保存设置失败，请查看服务日志。'
+        public_message = 'Lưu cài đặt thất bại, vui lòng xem nhật ký dịch vụ.'
         _append_settings_message(messages, 'danger', public_message)
         return {
             'success': False,
             'messages': messages,
             'updated_config': None,
             'final_stage': 'failed',
-            'final_message': '保存设置失败',
+            'final_message': 'Lưu cài đặt thất bại',
             'final_detail': public_message,
             'final_level': 'error',
         }
@@ -1539,18 +1539,18 @@ def tgbot_upload_token_required(f):
             return f(*args, **kwargs)
 
         if _is_tgbot_upload_rate_limited():
-            return jsonify({'success': False, 'message': '请求过于频繁，请稍后再试。'}), 429
+            return jsonify({'success': False, 'message': 'Yêu cầu quá thường xuyên, vui lòng thử lại sau.'}), 429
 
         config = load_config()
         if not config.get('TG_BOT_API_TOKEN_HASH'):
             return jsonify({
                 'success': False,
-                'message': 'Telegram Bot API Token 未配置，请先在设置页生成专用 Token。'
+                'message': 'Chưa cấu hình Telegram Bot API Token, vui lòng tạo Token riêng tại trang cài đặt.'
             }), 403
 
         token = _extract_bearer_token()
         if not _verify_tgbot_api_token(token, config):
-            return jsonify({'success': False, 'message': 'Telegram Bot API Token 无效或缺失。'}), 401
+            return jsonify({'success': False, 'message': 'Telegram Bot API Token không hợp lệ hoặc bị thiếu.'}), 401
 
         return f(*args, **kwargs)
     return decorated_function
@@ -1563,7 +1563,7 @@ def login_required(f):
         config = load_config()
         if config.get('password_protection_enabled'):
             if 'logged_in' not in session:
-                flash('请先登录以访问此页面。', 'info')
+                flash('Vui lòng đăng nhập trước để truy cập trang này.', 'info')
                 return redirect(url_for('login', next=request.full_path))
         return f(*args, **kwargs)
     return decorated_function
@@ -1656,23 +1656,23 @@ def init_id_mapping():
 def task_status_display(status):
     """将任务状态代码转换为显示文本"""
     status_map = {
-        TASK_STATES['PENDING']: '等待处理',
-        TASK_STATES['DOWNLOADING']: '下载中',
-        TASK_STATES['DOWNLOADED']: '下载完成',
-        TASK_STATES['TRANSLATING_SUBTITLE']: '翻译字幕中',
-    TASK_STATES['ASR_TRANSCRIBING']: '语音转写中',
-        TASK_STATES['ENCODING_VIDEO']: '转码视频中',
-        TASK_STATES['TRANSLATING']: '翻译中',
-        TASK_STATES['TAGGING']: '生成标签中',
-        TASK_STATES['PARTITIONING']: '推荐分区中',
-        TASK_STATES['MODERATING']: '内容审核中',
-        TASK_STATES['AWAITING_REVIEW']: '等待人工审核',
-        TASK_STATES['READY_FOR_UPLOAD']: '准备上传',
-        TASK_STATES['UPLOADING']: '上传中',
-        TASK_STATES['COMPLETED']: '已完成',
-        TASK_STATES['FAILED']: '失败',
-        'fetching_info': '采集信息中',
-        'info_fetched': '信息已采集',
+        TASK_STATES['PENDING']: 'Đang chờ xử lý',
+        TASK_STATES['DOWNLOADING']: 'Đang tải xuống',
+        TASK_STATES['DOWNLOADED']: 'Tải xuống hoàn thành',
+        TASK_STATES['TRANSLATING_SUBTITLE']: 'Đang dịch phụ đề',
+    TASK_STATES['ASR_TRANSCRIBING']: 'Đang chuyển giọng nói thành văn bản',
+        TASK_STATES['ENCODING_VIDEO']: 'Đang chuyển mã video',
+        TASK_STATES['TRANSLATING']: 'Đang dịch',
+        TASK_STATES['TAGGING']: 'Đang tạo thẻ tag',
+        TASK_STATES['PARTITIONING']: 'Đang gợi ý chuyên mục',
+        TASK_STATES['MODERATING']: 'Đang kiểm duyệt nội dung',
+        TASK_STATES['AWAITING_REVIEW']: 'Đang chờ kiểm duyệt thủ công',
+        TASK_STATES['READY_FOR_UPLOAD']: 'Chuẩn bị tải lên',
+        TASK_STATES['UPLOADING']: 'Đang tải lên',
+        TASK_STATES['COMPLETED']: 'Đã hoàn thành',
+        TASK_STATES['FAILED']: 'Thất bại',
+        'fetching_info': 'Đang thu thập thông tin',
+        'info_fetched': 'Đã thu thập thông tin',
     }
     return status_map.get(status, status)
 
@@ -1815,38 +1815,38 @@ def parse_youtube_duration(duration_str):
 app.jinja_env.filters['parse_youtube_duration'] = parse_youtube_duration
 
 ALIYUN_LABEL_MAP = {
-    "pornographic_adult": "疑似色情内容",
-    "sexual_terms": "疑似性健康内容",
-    "sexual_suggestive": "疑似低俗内容",
-    "political_figure": "疑似政治人物",
-    "political_entity": "疑似政治实体",
-    "political_n": "疑似敏感政治内容",
-    "political_p": "疑似涉政禁宣人物",
-    "political_a": "涉政专项升级保障",
-    "violent_extremist": "疑似极端组织",
-    "violent_incidents": "疑似极端主义内容",
-    "violent_weapons": "疑似武器弹药",
-    "contraband_drug": "疑似毒品相关",
-    "contraband_gambling": "疑似赌博相关",
-    "contraband_act": "疑似违禁行为",
-    "contraband_entity": "疑似违禁工具",
-    "inappropriate_discrimination": "疑似偏见歧视内容",
-    "inappropriate_ethics": "疑似不良价值观内容",
-    "inappropriate_profanity": "疑似攻击辱骂内容",
-    "inappropriate_oral": "疑似低俗口头语内容",
-    "inappropriate_superstition": "疑似封建迷信内容",
-    "inappropriate_nonsense": "疑似无意义灌水内容",
-    "pt_to_sites": "疑似站外引流",
-    "pt_by_recruitment": "疑似网赚兼职广告",
-    "pt_to_contact": "疑似引流广告号",
-    "religion_b": "疑似涉及佛教",
-    "religion_t": "疑似涉及道教",
-    "religion_c": "疑似涉及基督教",
-    "religion_i": "疑似涉及伊斯兰教",
-    "religion_h": "疑似涉及印度教",
-    "customized": "命中自定义词库",
-    "nonLabel": "内容正常", # 通常表示无风险
-    "normal": "内容正常" # 另一种表示无风险的标签
+    "pornographic_adult": "Nghi ngờ nội dung khiêu dâm",
+    "sexual_terms": "Nghi ngờ nội dung sức khỏe tình dục",
+    "sexual_suggestive": "Nghi ngờ nội dung thô tục",
+    "political_figure": "Nghi ngờ nhân vật chính trị",
+    "political_entity": "Nghi ngờ thực thể chính trị",
+    "political_n": "Nghi ngờ nội dung chính trị nhạy cảm",
+    "political_p": "Nghi ngờ nhân vật cấm tuyên truyền liên quan chính trị",
+    "political_a": "Bảo vệ nâng cấp chuyên đề liên quan chính trị",
+    "violent_extremist": "Nghi ngờ tổ chức cực đoan",
+    "violent_incidents": "Nghi ngờ nội dung cực đoan",
+    "violent_weapons": "Nghi ngờ vũ khí đạn dược",
+    "contraband_drug": "Nghi ngờ liên quan ma túy",
+    "contraband_gambling": "Nghi ngờ liên quan cờ bạc",
+    "contraband_act": "Nghi ngờ hành vi bị cấm",
+    "contraband_entity": "Nghi ngờ công cụ bị cấm",
+    "inappropriate_discrimination": "Nghi ngờ nội dung định kiến phân biệt",
+    "inappropriate_ethics": "Nghi ngờ nội dung giá trị quan lệch lạc",
+    "inappropriate_profanity": "Nghi ngờ nội dung công kích chửi bới",
+    "inappropriate_oral": "Nghi ngờ nội dung khẩu ngữ thô tục",
+    "inappropriate_superstition": "Nghi ngờ nội dung mê tín phong kiến",
+    "inappropriate_nonsense": "Nghi ngờ nội dung spam vô nghĩa",
+    "pt_to_sites": "Nghi ngờ kéo lưu lượng ra ngoài nền tảng",
+    "pt_by_recruitment": "Nghi ngờ quảng cáo kiếm tiền online/việc làm thêm",
+    "pt_to_contact": "Nghi ngờ tài khoản quảng cáo kéo lưu lượng",
+    "religion_b": "Nghi ngờ liên quan Phật giáo",
+    "religion_t": "Nghi ngờ liên quan Đạo giáo",
+    "religion_c": "Nghi ngờ liên quan Cơ đốc giáo",
+    "religion_i": "Nghi ngờ liên quan Hồi giáo",
+    "religion_h": "Nghi ngờ liên quan Ấn Độ giáo",
+    "customized": "Trúng từ điển tùy chỉnh",
+    "nonLabel": "Nội dung bình thường", # 通常表示无风险
+    "normal": "Nội dung bình thường" # 另一种表示无风险的标签
     # 可以根据需要添加更多映射
 }
 
@@ -1881,7 +1881,7 @@ def login():
         remaining = int(sec['locked_until'] - now_ts)
         minutes = remaining // 60
         seconds = remaining % 60
-        flash(f'登录已被临时锁定，请 {minutes} 分 {seconds} 秒后重试。', 'danger')
+        flash(f'Đăng nhập đã bị khóa tạm thời, vui lòng thử lại sau {minutes} phút {seconds} giây.', 'danger')
         return render_template('login.html')
 
     if request.method == 'POST':
@@ -1890,7 +1890,7 @@ def login():
 
         # 检查是否有设置密码
         if not stored_password:
-            flash('系统尚未设置密码，无法登录。请在禁用密码保护的情况下，进入设置页面设置密码。', 'danger')
+            flash('Hệ thống chưa đặt mật khẩu, không thể đăng nhập. Vui lòng tắt bảo vệ bằng mật khẩu rồi vào trang cài đặt để đặt mật khẩu.', 'danger')
             return render_template('login.html')
 
         if password and password == stored_password:
@@ -1905,7 +1905,7 @@ def login():
                     'ip_address': _get_request_ip_address(),
                 }
             )
-            flash('登录成功', 'success')
+            flash('Đăng nhập thành công', 'success')
             return redirect(url_for('index'))
         else:
             # 密码错误，更新失败计数
@@ -1927,18 +1927,18 @@ def login():
                         'lock_minutes': lock_minutes,
                     }
                 )
-                flash(f'密码错误次数过多（{failed}/{max_attempts}），已锁定 {lock_minutes} 分钟。', 'danger')
+                flash(f'Nhập sai mật khẩu quá nhiều lần ({failed}/{max_attempts}), đã khóa {lock_minutes} phút.', 'danger')
             else:
                 _save_security_state(sec)
                 remain = max_attempts - failed
-                flash(f'密码错误。还可尝试 {remain} 次后将被锁定。', 'danger')
+                flash(f'Sai mật khẩu. Còn có thể thử {remain} lần nữa rồi sẽ bị khóa.', 'danger')
     
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.clear()
-    flash('您已成功退出。', 'info')
+    flash('Bạn đã đăng xuất thành công.', 'info')
     return redirect(url_for('login'))
 
 @app.route('/')
@@ -2040,7 +2040,7 @@ def index():
                 upload_id = None
             recent_tasks.append({
                 'id': r[0],
-                'title': r[1] or r[2] or '未获取标题',
+                'title': r[1] or r[2] or 'Chưa lấy được tiêu đề',
                 'status': r[3],
                 'updated_at': r[4],
                 'upload_target': upload_target,
@@ -2114,7 +2114,7 @@ def task_fragment(task_id):
     """返回单个任务的桌面/移动端片段 HTML。"""
     task = get_task(task_id)
     if not task:
-        return jsonify({'success': False, 'message': '任务不存在'}), 404
+        return jsonify({'success': False, 'message': 'Nhiệm vụ không tồn tại'}), 404
 
     config = load_config()
     return jsonify({
@@ -2138,7 +2138,7 @@ def _missing_upload_partition_labels(task, config):
             or ''
         ).strip()
         if not fixed_acfun_pid and not acfun_partition and not recommend_enabled:
-            missing.append('AcFun 分区')
+            missing.append('Chuyên mục AcFun')
 
     if upload_target in ('bilibili', 'both'):
         fixed_bili_pid = str(config.get('FIXED_PARTITION_ID_BILIBILI', '') or '').strip()
@@ -2150,7 +2150,7 @@ def _missing_upload_partition_labels(task, config):
             or ''
         ).strip()
         if not fixed_bili_pid and not bili_partition and not recommend_enabled:
-            missing.append('bilibili 分区')
+            missing.append('Chuyên mục bilibili')
 
     return missing
 
@@ -2237,7 +2237,7 @@ def edit_task(task_id):
     task = get_task(task_id)
     
     if not task:
-        flash('任务不存在', 'danger')
+        flash('Nhiệm vụ không tồn tại', 'danger')
         return redirect(url_for('tasks'))
     
     if request.method == 'POST':
@@ -2250,19 +2250,19 @@ def edit_task(task_id):
             try:
                 cover_file = request.files.get('cover_file')
                 _replace_task_cover(task, cover_file)
-                flash('任务封面已更新。', 'success')
+                flash('Đã cập nhật ảnh bìa nhiệm vụ.', 'success')
             except Exception as e:
                 logger.warning(f"替换任务 {task_id} 封面失败: {e}")
-                flash(f'更换封面失败: {e}', 'danger')
+                flash(f'Thay ảnh bìa thất bại: {e}', 'danger')
             return redirect(redirect_target)
 
         if action == 'restore_cover':
             try:
                 _restore_task_cover(task)
-                flash('已恢复原始封面。', 'success')
+                flash('Đã khôi phục ảnh bìa gốc.', 'success')
             except Exception as e:
                 logger.warning(f"恢复任务 {task_id} 原始封面失败: {e}")
-                flash(f'恢复原封面失败: {e}', 'danger')
+                flash(f'Khôi phục ảnh bìa gốc thất bại: {e}', 'danger')
             return redirect(redirect_target)
 
         upload_target = str(task.get('upload_target') or 'acfun').lower()
@@ -2325,20 +2325,20 @@ def edit_task(task_id):
         if action == 'force_upload':
             config = load_config()
             upload_target = str((updated_task or task).get('upload_target') or 'acfun').lower()
-            platform_name = '双平台' if upload_target == 'both' else ('bilibili' if upload_target == 'bilibili' else 'AcFun')
+            platform_name = 'Cả hai nền tảng' if upload_target == 'both' else ('bilibili' if upload_target == 'bilibili' else 'AcFun')
             missing_partitions = _missing_upload_partition_labels(updated_task or task, config)
             if missing_partitions:
-                flash(f'请先选择{ "、".join(missing_partitions) }，或开启分区推荐后再继续上传。', 'danger')
+                flash(f'Vui lòng chọn {", ".join(missing_partitions)} trước, hoặc bật gợi ý chuyên mục rồi tiếp tục tải lên.', 'danger')
                 return redirect(redirect_target)
 
             _start_background_force_upload(task_id, config, platform_name)
-            flash(f'已保存当前修改，并启动强制上传到{platform_name}，正在后台处理...', 'info')
+            flash(f'Đã lưu thay đổi hiện tại và bắt đầu tải lên bắt buộc tới {platform_name}, đang xử lý trong nền...', 'info')
             return redirect(url_for('manual_review'))
 
         if updated_task and updated_task['status'] == TASK_STATES['READY_FOR_UPLOAD']:
-            flash('任务已保存，当前可单独执行上传。', 'success')
+            flash('Đã lưu nhiệm vụ, hiện có thể thực hiện tải lên riêng.', 'success')
         else:
-            flash('任务已保存。', 'success')
+            flash('Đã lưu nhiệm vụ.', 'success')
 
         return redirect(redirect_target)
     
@@ -2450,7 +2450,7 @@ def add_task_via_extension():
             upload_target = request.form.get('upload_target')
 
         if not youtube_url:
-            return jsonify({'success': False, 'message': 'YouTube URL不能为空'}), 400
+            return jsonify({'success': False, 'message': 'YouTube URL không được để trống'}), 400
 
         config = load_config()
         if not upload_target:
@@ -2459,7 +2459,7 @@ def add_task_via_extension():
             upload_target = str(upload_target).strip().lower()
 
         if upload_target not in ('acfun', 'bilibili', 'both'):
-            return jsonify({'success': False, 'message': '无效的投稿平台参数'}), 400
+            return jsonify({'success': False, 'message': 'Tham số nền tảng đăng tải không hợp lệ'}), 400
         
         # 判断是否为播放列表URL
         if 'youtube.com/playlist' in youtube_url or 'youtu.be/playlist' in youtube_url:
@@ -2467,7 +2467,7 @@ def add_task_via_extension():
             cookies_path = config.get('YOUTUBE_COOKIES_PATH')
             video_urls = extract_video_urls_from_playlist(youtube_url, cookies_path)
             if not video_urls:
-                return jsonify({'success': False, 'message': '未能提取到播放列表中的视频'}), 400
+                return jsonify({'success': False, 'message': 'Không trích xuất được video trong danh sách phát'}), 400
             
             added_count = 0
             task_ids = []
@@ -2482,7 +2482,7 @@ def add_task_via_extension():
             
             return jsonify({
                 'success': True,
-                'message': f'已批量添加 {added_count} 个视频任务（来自播放列表）',
+                'message': f'Đã thêm hàng loạt {added_count} nhiệm vụ video (từ danh sách phát)',
                 'task_ids': task_ids,
                 'count': added_count
             }), 200
@@ -2495,21 +2495,21 @@ def add_task_via_extension():
                     start_task(task_id, config)
                     return jsonify({
                         'success': True,
-                        'message': f'任务已添加并开始处理',
+                        'message': f'Đã thêm nhiệm vụ và bắt đầu xử lý',
                         'task_id': task_id
                     }), 200
                 else:
                     return jsonify({
                         'success': True,
-                        'message': '任务已添加',
+                        'message': 'Đã thêm nhiệm vụ',
                         'task_id': task_id
                     }), 200
             else:
-                return jsonify({'success': False, 'message': '添加任务失败'}), 500
+                return jsonify({'success': False, 'message': 'Thêm nhiệm vụ thất bại'}), 500
                 
     except Exception as e:
         logger.error(f"通过扩展添加任务失败: {str(e)}")
-        return jsonify({'success': False, 'message': '服务器内部错误，请稍后重试'}), 500
+        return jsonify({'success': False, 'message': 'Lỗi nội bộ máy chủ, vui lòng thử lại sau'}), 500
 
 @app.route('/tasks/add', methods=['POST'])
 @login_required
@@ -2519,7 +2519,7 @@ def add_task_route():
     upload_target = request.form.get('upload_target')
     
     if not youtube_url:
-        flash('YouTube URL不能为空', 'danger')
+        flash('YouTube URL không được để trống', 'danger')
         return redirect(url_for('tasks'))
 
     config = load_config()
@@ -2532,14 +2532,14 @@ def add_task_route():
         cookies_path = config.get('YOUTUBE_COOKIES_PATH')
         video_urls = extract_video_urls_from_playlist(youtube_url, cookies_path)
         if not video_urls:
-            flash('未能提取到播放列表中的视频', 'danger')
+            flash('Không trích xuất được video trong danh sách phát', 'danger')
             return redirect(url_for('tasks'))
         added_count = 0
         for url in video_urls:
             task_id = add_task(url, upload_target=upload_target)
             if task_id:
                 added_count += 1
-        flash(f'已批量添加 {added_count} 个视频任务（来自播放列表）', 'success')
+        flash(f'Đã thêm hàng loạt {added_count} nhiệm vụ video (từ danh sách phát)', 'success')
         return redirect(url_for('tasks'))
     else:
         task_id = add_task(youtube_url, upload_target=upload_target)
@@ -2547,11 +2547,11 @@ def add_task_route():
             if config.get('AUTO_MODE_ENABLED', False):
                 logger.info(f"自动模式已启用，立即开始处理任务 {task_id}")
                 start_task(task_id, config)
-                flash(f'任务已添加并开始处理: {youtube_url}', 'success')
+                flash(f'Đã thêm nhiệm vụ và bắt đầu xử lý: {youtube_url}', 'success')
             else:
-                flash(f'任务已添加: {youtube_url}', 'success')
+                flash(f'Đã thêm nhiệm vụ: {youtube_url}', 'success')
         else:
-            flash(f'添加任务失败: {youtube_url}', 'danger')
+            flash(f'Thêm nhiệm vụ thất bại: {youtube_url}', 'danger')
         return redirect(url_for('tasks'))
 
 @app.route('/tasks/<task_id>/start', methods=['POST'])
@@ -2561,11 +2561,11 @@ def start_task_route(task_id):
     task = get_task(task_id)
     
     if not task:
-        flash('任务不存在', 'danger')
+        flash('Nhiệm vụ không tồn tại', 'danger')
         return redirect(url_for('tasks'))
     
     if task['status'] not in [TASK_STATES['PENDING'], TASK_STATES['FAILED']]:
-        flash(f'当前任务状态为 {task_status_display(task["status"])}，不能启动', 'warning')
+        flash(f'Trạng thái nhiệm vụ hiện tại là {task_status_display(task["status"])}, không thể khởi động', 'warning')
         return redirect(url_for('tasks'))
     
     # 获取当前配置
@@ -2577,13 +2577,13 @@ def start_task_route(task_id):
     if success:
         # 检查是否是自动模式
         if config.get('AUTO_MODE_ENABLED', False):
-            flash('任务已启动，自动模式将会自动完成下载、处理和上传', 'info')
+            flash('Nhiệm vụ đã khởi động, chế độ tự động sẽ tự hoàn tất tải xuống, xử lý và tải lên', 'info')
             
             # 使用传统页面刷新方式
         else:
-            flash('任务处理已启动', 'success')
+            flash('Đã khởi động xử lý nhiệm vụ', 'success')
     else:
-        flash('启动任务处理失败', 'danger')
+        flash('Khởi động xử lý nhiệm vụ thất bại', 'danger')
     
     return redirect(url_for('tasks'))
 
@@ -2596,9 +2596,9 @@ def delete_task_route(task_id):
     success = delete_task(task_id, delete_files)
     
     if success:
-        flash('任务已删除', 'success')
+        flash('Đã xóa nhiệm vụ', 'success')
     else:
-        flash('删除任务失败', 'danger')
+        flash('Xóa nhiệm vụ thất bại', 'danger')
     
     return redirect(url_for('tasks'))
 
@@ -2611,12 +2611,12 @@ def clear_all_tasks_route():
         delete_files = request.form.get('delete_files', 'true').lower() in ['true', '1', 'on']
         success = clear_all_tasks(delete_files=delete_files)
         if success:
-            flash('所有任务已清空', 'success')
+            flash('Đã xóa hết mọi nhiệm vụ', 'success')
         else:
-            flash('清空任务失败，请查看日志', 'danger')
+            flash('Xóa hết nhiệm vụ thất bại, vui lòng xem nhật ký', 'danger')
     except Exception as e:
         logger.error(f"清空所有任务失败: {e}")
-        flash(f'清空任务失败: {e}', 'danger')
+        flash(f'Xóa hết nhiệm vụ thất bại: {e}', 'danger')
     return redirect(url_for('tasks'))
 
 
@@ -2631,12 +2631,12 @@ def retry_failed_tasks_route():
         if isinstance(result, dict):
             scheduled = result.get('scheduled', 0)
             total = result.get('total', 0)
-            flash(f'已重新调度 {scheduled}/{total} 个失败任务', 'success')
+            flash(f'Đã lên lịch lại {scheduled}/{total} nhiệm vụ thất bại', 'success')
         else:
-            flash('重新调度失败，请查看日志', 'danger')
+            flash('Lên lịch lại thất bại, vui lòng xem nhật ký', 'danger')
     except Exception as e:
         logger.error(f"重试失败任务失败: {e}")
-        flash(f'重试失败任务失败: {e}', 'danger')
+        flash(f'Thử lại nhiệm vụ thất bại không thành công: {e}', 'danger')
     return redirect(url_for('tasks'))
 
 
@@ -2646,11 +2646,11 @@ def retry_metadata_translation_route(task_id):
     """重新执行因自动翻译失败而暂停的任务。"""
     task = get_task(task_id)
     if not task:
-        flash('任务不存在', 'danger')
+        flash('Nhiệm vụ không tồn tại', 'danger')
         return redirect(url_for('manual_review'))
 
     if not is_metadata_translation_retryable(task):
-        flash('当前任务不是可重试的自动翻译失败任务', 'warning')
+        flash('Nhiệm vụ hiện tại không phải nhiệm vụ dịch tự động thất bại có thể thử lại', 'warning')
         return redirect(url_for('manual_review'))
 
     config = load_config()
@@ -2661,12 +2661,12 @@ def retry_metadata_translation_route(task_id):
 
     try:
         if retry_metadata_translation_task(task_id, config):
-            flash('已重新启动自动翻译，任务将在后台继续处理', 'success')
+            flash('Đã khởi động lại dịch tự động, nhiệm vụ sẽ tiếp tục xử lý trong nền', 'success')
         else:
-            flash('重新启动自动翻译失败，请稍后重试', 'danger')
+            flash('Khởi động lại dịch tự động thất bại, vui lòng thử lại sau', 'danger')
     except Exception as exc:
         logger.error(f"重试任务 {task_id} 的自动翻译失败: {exc}")
-        flash('重新启动自动翻译失败，请查看日志', 'danger')
+        flash('Khởi động lại dịch tự động thất bại, vui lòng xem nhật ký', 'danger')
 
     return redirect(url_for('manual_review'))
 
@@ -2677,20 +2677,20 @@ def force_upload_task_route(task_id):
     task = get_task(task_id)
     
     if not task:
-        flash('任务不存在', 'danger')
+        flash('Nhiệm vụ không tồn tại', 'danger')
         return redirect(url_for('manual_review'))
     
     # 获取当前配置
     config = load_config()
     upload_target = str(task.get('upload_target') or 'acfun').lower()
-    platform_name = '双平台' if upload_target == 'both' else ('bilibili' if upload_target == 'bilibili' else 'AcFun')
+    platform_name = 'Cả hai nền tảng' if upload_target == 'both' else ('bilibili' if upload_target == 'bilibili' else 'AcFun')
     missing_partitions = _missing_upload_partition_labels(task, config)
     if missing_partitions:
-        flash(f'请先选择{ "、".join(missing_partitions) }，或开启分区推荐后再继续上传。', 'danger')
+        flash(f'Vui lòng chọn {", ".join(missing_partitions)} trước, hoặc bật gợi ý chuyên mục rồi tiếp tục tải lên.', 'danger')
         return redirect(url_for('edit_task', task_id=task_id))
     
     # 启动后台强制上传
-    flash(f'已启动强制上传到{platform_name}，正在后台处理...', 'info')
+    flash(f'Đã bắt đầu tải lên bắt buộc tới {platform_name}, đang xử lý trong nền...', 'info')
 
     _start_background_force_upload(task_id, config, platform_name)
 
@@ -2705,12 +2705,12 @@ def reset_stuck_tasks_route():
     try:
         reset_count = reset_stuck_tasks()
         if reset_count > 0:
-            flash(f'已重置 {reset_count} 个卡住的任务', 'success')
+            flash(f'Đã đặt lại {reset_count} nhiệm vụ bị kẹt', 'success')
         else:
-            flash('没有发现卡住的任务', 'info')
+            flash('Không phát hiện nhiệm vụ bị kẹt', 'info')
     except Exception as e:
         logger.error(f"重置卡住任务失败: {str(e)}")
-        flash('重置卡住任务失败', 'danger')
+        flash('Đặt lại nhiệm vụ bị kẹt thất bại', 'danger')
     
     return redirect(url_for('tasks'))
 
@@ -2721,14 +2721,14 @@ def abandon_task_route(task_id):
     delete_files = request.form.get('delete_files', 'true').lower() in ('true', 'yes', '1', 'on')
     
     # 更新任务状态为失败
-    update_task(task_id, status=TASK_STATES['FAILED'], error_message="用户主动放弃任务")
+    update_task(task_id, status=TASK_STATES['FAILED'], error_message="Người dùng chủ động hủy nhiệm vụ")
     
     if delete_files:
         # 删除任务文件
         from modules.task_manager import delete_task_files
         delete_task_files(task_id)
     
-    flash('任务已废弃', 'success')
+    flash('Đã hủy nhiệm vụ', 'success')
     return redirect(url_for('tasks'))
 
 # 系统健康检查辅助函数
@@ -2773,8 +2773,8 @@ def get_directory_size(path):
         logger.warning(f"获取目录大小失败 {path}: {e}")
         return 0
 
-def _public_health_check_error_message(component: str = '检查项') -> str:
-    return f'{component}检查失败，请查看服务日志。'
+def _public_health_check_error_message(component: str = 'Mục kiểm tra') -> str:
+    return f'{component} kiểm tra thất bại, vui lòng xem nhật ký dịch vụ.'
 
 def get_database_info():
     """获取数据库文件信息"""
@@ -2803,7 +2803,7 @@ def get_database_info():
             'path': 'unknown',
             'size': 0,
             'writable': False,
-            'error': _public_health_check_error_message('数据库')
+            'error': _public_health_check_error_message('Cơ sở dữ liệu')
         }
 
 def get_database_debug_info():
@@ -2835,7 +2835,7 @@ def get_database_debug_info():
         return debug_info
     except Exception as e:
         logger.warning("获取数据库调试信息失败: %s", e)
-        return {'error': _public_health_check_error_message('数据库')}
+        return {'error': _public_health_check_error_message('Cơ sở dữ liệu')}
 
 def get_file_info(file_path):
     """获取文件详细信息"""
@@ -2863,7 +2863,7 @@ def get_file_info(file_path):
             'size': 0,
             'readable': False,
             'last_modified': None,
-            'error': _public_health_check_error_message('文件')
+            'error': _public_health_check_error_message('Tệp')
         }
 
 def get_path_debug_info(file_path):
@@ -2888,7 +2888,7 @@ def get_path_debug_info(file_path):
         return debug_info
     except Exception as e:
         logger.warning("获取路径调试信息失败: %s", e)
-        return {'error': _public_health_check_error_message('路径')}
+        return {'error': _public_health_check_error_message('Đường dẫn')}
 
 @app.route('/system_health')
 def system_health():
@@ -2937,7 +2937,7 @@ def system_health():
         
         health_status['database'] = {
             'status': 'ok',
-            'message': f'数据库正常，共有 {task_count} 个任务',
+            'message': f'Cơ sở dữ liệu bình thường, có tổng cộng {task_count} nhiệm vụ',
             'location': db_info['path'],
             'size_mb': round(db_info['size'] / 1024 / 1024, 2),
             'writable': db_info['writable']
@@ -2976,7 +2976,7 @@ def system_health():
         logger.exception("数据库健康检查失败")
         health_status['database'] = {
             'status': 'error',
-            'message': _public_health_check_error_message('数据库'),
+            'message': _public_health_check_error_message('Cơ sở dữ liệu'),
             'details': get_database_debug_info()
         }
     
@@ -3025,7 +3025,7 @@ def system_health():
         else:
             health_status['youtube_cookies'] = {
                 'status': 'warning',
-                'message': '未配置YouTube cookies路径'
+                'message': 'Chưa cấu hình đường dẫn YouTube cookies'
             }
         
         # AcFun cookies
@@ -3064,7 +3064,7 @@ def system_health():
         else:
             health_status['acfun_cookies'] = {
                 'status': 'warning',
-                'message': '未配置AcFun cookies路径'
+                'message': 'Chưa cấu hình đường dẫn AcFun cookies'
             }
 
         # Bilibili cookies
@@ -3102,7 +3102,7 @@ def system_health():
         else:
             health_status['bilibili_cookies'] = {
                 'status': 'warning',
-                'message': '未配置Bilibili cookies路径'
+                'message': 'Chưa cấu hình đường dẫn bilibili cookies'
             }
         
         logger.info("cookies健康检查完成")
@@ -3157,8 +3157,8 @@ def settings():
             _update_settings_save_progress(
                 operation_id,
                 stage='saving_config',
-                message='正在准备保存设置',
-                detail='保存任务已创建，正在后台执行。',
+                message='Đang chuẩn bị lưu cài đặt',
+                detail='Đã tạo nhiệm vụ lưu, đang chạy trong nền.',
                 percent=None,
                 done=False,
                 level='info',
@@ -3213,14 +3213,14 @@ def update_cover_mode():
     if not isinstance(payload, dict):
         return jsonify({
             'success': False,
-            'message': '请求体必须是 JSON 对象。',
+            'message': 'Phần thân yêu cầu phải là đối tượng JSON.',
         }), 400
 
     mode = payload.get('mode')
     if not isinstance(mode, str) or mode not in ('crop', 'pad'):
         return jsonify({
             'success': False,
-            'message': '封面处理模式必须是 crop 或 pad。',
+            'message': 'Chế độ xử lý ảnh bìa phải là crop hoặc pad.',
         }), 400
 
     try:
@@ -3229,7 +3229,7 @@ def update_cover_mode():
         logger.error('保存封面处理模式失败: %s', exc)
         return jsonify({
             'success': False,
-            'message': '保存封面处理模式失败，请稍后重试。',
+            'message': 'Lưu chế độ xử lý ảnh bìa thất bại, vui lòng thử lại sau.',
         }), 500
 
     # Keep the running application and task processor in sync with the
@@ -3248,7 +3248,7 @@ def update_cover_mode():
         'success': True,
         'mode': mode,
         'cover_processing_mode': mode,
-        'message': '封面处理模式已更新。',
+        'message': 'Đã cập nhật chế độ xử lý ảnh bìa.',
     })
 
 
@@ -3259,7 +3259,7 @@ def settings_tgbot_token():
     payload = payload or {}
     csrf_token = payload.get('csrf_token') or request.headers.get('X-CSRF-Token')
     if not _validate_tgbot_token_csrf(csrf_token):
-        return jsonify({'success': False, 'message': '安全校验失败，请刷新设置页后重试。'}), 403
+        return jsonify({'success': False, 'message': 'Kiểm tra bảo mật thất bại, vui lòng làm mới trang cài đặt rồi thử lại.'}), 403
 
     action = str(payload.get('action') or '').strip().lower()
     if action in ('generate', 'reset'):
@@ -3271,7 +3271,7 @@ def settings_tgbot_token():
         })
         return jsonify({
             'success': True,
-            'message': 'Telegram Bot API Token 已生成，旧 Token 已失效。请立即复制保存。',
+            'message': 'Đã tạo Telegram Bot API Token, Token cũ đã hết hiệu lực. Vui lòng sao chép và lưu ngay.',
             'token': token,
             'state': _tgbot_api_token_state(updated_config),
             'csrf_token': _ensure_tgbot_token_csrf_token(),
@@ -3285,14 +3285,14 @@ def settings_tgbot_token():
         })
         return jsonify({
             'success': True,
-            'message': 'Telegram Bot API Token 已撤销。',
+            'message': 'Đã thu hồi Telegram Bot API Token.',
             'state': _tgbot_api_token_state(updated_config),
             'csrf_token': _ensure_tgbot_token_csrf_token(),
         })
 
     return jsonify({
         'success': False,
-        'message': '未知的 Token 操作。',
+        'message': 'Thao tác Token không xác định.',
         'csrf_token': _ensure_tgbot_token_csrf_token(),
     }), 400
 
@@ -3341,7 +3341,7 @@ def settings_test_notification():
         channel = str(request.form.get('channel') or '').strip()
 
     if channel not in (CHANNEL_WECOM, CHANNEL_SERVERCHAN, CHANNEL_MESSAGE_PUSHER):
-        return jsonify({'success': False, 'message': '不支持的通知渠道'}), 400
+        return jsonify({'success': False, 'message': 'Kênh thông báo không được hỗ trợ'}), 400
 
     try:
         config = load_config()
@@ -3350,17 +3350,17 @@ def settings_test_notification():
         service.send_test_message(channel)
         return jsonify({
             'success': True,
-            'message': f'{CHANNEL_LABELS.get(channel, channel)} 测试消息已发送'
+            'message': f'{CHANNEL_LABELS.get(channel, channel)} Đã gửi tin nhắn kiểm tra'
         })
     except ValueError:
         logger.warning("测试通知发送失败，渠道=%s", channel, exc_info=True)
         return jsonify({
             'success': False,
-            'message': f'{CHANNEL_LABELS.get(channel, channel)} 配置不完整，请检查后重试'
+            'message': f'{CHANNEL_LABELS.get(channel, channel)} Cấu hình chưa đầy đủ, vui lòng kiểm tra rồi thử lại'
         }), 400
     except Exception:
         logger.exception("测试通知发送失败，渠道=%s", channel)
-        return jsonify({'success': False, 'message': '测试通知发送失败，请稍后重试'}), 500
+        return jsonify({'success': False, 'message': 'Gửi thông báo kiểm tra thất bại, vui lòng thử lại sau'}), 500
 
 
 @app.route('/settings/cookiecloud/test', methods=['POST'])
@@ -3372,8 +3372,8 @@ def settings_test_cookiecloud():
     try:
         result = test_cookiecloud_youtube_sync(effective_config)
         message = (
-            f"CookieCloud 连接成功，已解析 {result['cookie_count']} 条 YouTube/Google Cookies，"
-            f"当前使用 {result['crypto_type_used']} 算法。"
+            f"Kết nối CookieCloud thành công, đã phân tích {result['cookie_count']} Cookie YouTube/Google,"
+            f"hiện đang dùng thuật toán {result['crypto_type_used']}."
         )
         updated_at = _remember_cookiecloud_sync_result(True, message)
         return jsonify({
@@ -3415,8 +3415,8 @@ def settings_sync_cookiecloud():
     try:
         result = sync_cookiecloud_to_youtube_file(effective_config)
         message = (
-            f"CookieCloud 已成功写入 {result['cookie_count']} 条 YouTube/Google Cookies 到 "
-            f"{result['output_path_display']}。"
+            f"CookieCloud đã ghi thành công {result['cookie_count']} Cookie YouTube/Google vào "
+            f"{result['output_path_display']}."
         )
         updated_at = _remember_cookiecloud_sync_result(True, message)
         return jsonify({
@@ -3477,7 +3477,7 @@ def acfun_qrcode_start():
         })
     except Exception as e:
         logger.error(f"发起 AcFun 二维码登录失败: {e}")
-        return jsonify({'success': False, 'message': '二维码登录失败，请稍后重试'}), 500
+        return jsonify({'success': False, 'message': 'Đăng nhập bằng mã QR thất bại, vui lòng thử lại sau'}), 500
 
 @app.route('/settings/acfun/qrcode/status/<session_id>', methods=['GET'])
 @login_required
@@ -3485,7 +3485,7 @@ def acfun_qrcode_status(session_id):
     """轮询 AcFun 二维码登录状态。"""
     qr_session = _get_acfun_qr_session(session_id)
     if not qr_session:
-        return jsonify({'success': False, 'message': '二维码会话不存在或已过期'}), 404
+        return jsonify({'success': False, 'message': 'Phiên mã QR không tồn tại hoặc đã hết hạn'}), 404
 
     config = load_config()
     cookie_path = resolve_cookie_file_path(
@@ -3514,7 +3514,7 @@ def acfun_qrcode_status(session_id):
         return jsonify({'success': True, **status_data})
     except Exception as e:
         logger.error(f"查询 AcFun 二维码登录状态失败: {e}")
-        return jsonify({'success': False, 'message': '查询登录状态失败，请稍后重试'}), 500
+        return jsonify({'success': False, 'message': 'Truy vấn trạng thái đăng nhập thất bại, vui lòng thử lại sau'}), 500
 
 @app.route('/settings/bilibili/qrcode/start', methods=['POST'])
 @login_required
@@ -3542,7 +3542,7 @@ def bilibili_qrcode_start():
         })
     except Exception as e:
         logger.error(f"发起 bilibili 二维码登录失败: {e}")
-        return jsonify({'success': False, 'message': '二维码登录失败，请稍后重试'}), 500
+        return jsonify({'success': False, 'message': 'Đăng nhập bằng mã QR thất bại, vui lòng thử lại sau'}), 500
 
 @app.route('/settings/bilibili/qrcode/status/<session_id>', methods=['GET'])
 @login_required
@@ -3550,7 +3550,7 @@ def bilibili_qrcode_status(session_id):
     """轮询 bilibili 二维码登录状态。"""
     qr_session = _get_bilibili_qr_session(session_id)
     if not qr_session:
-        return jsonify({'success': False, 'message': '二维码会话不存在或已过期'}), 404
+        return jsonify({'success': False, 'message': 'Phiên mã QR không tồn tại hoặc đã hết hạn'}), 404
 
     config = load_config()
     cookie_path = resolve_cookie_file_path(
@@ -3577,7 +3577,7 @@ def bilibili_qrcode_status(session_id):
         return jsonify({'success': True, **status_data})
     except Exception as e:
         logger.error(f"查询 bilibili 二维码登录状态失败: {e}")
-        return jsonify({'success': False, 'message': '查询登录状态失败，请稍后重试'}), 500
+        return jsonify({'success': False, 'message': 'Truy vấn trạng thái đăng nhập thất bại, vui lòng thử lại sau'}), 500
 
 @app.route('/settings/reset', methods=['POST'])
 @login_required
@@ -3590,16 +3590,16 @@ def reset_settings():
         if keys:
             # 重置指定项
             reset_specific_config(keys)
-            flash('当前页面的设置已重置为默认值。', 'success')
+            flash('Đã đặt lại cài đặt của trang hiện tại về mặc định.', 'success')
         else:
             # 如果未指定keys，则不执行任何操作或返回错误
             # 为了防止误操作全重置，这里要求必须指定keys
-            return jsonify({'status': 'error', 'message': '未指定要重置的配置项'}), 400
+            return jsonify({'status': 'error', 'message': 'Chưa chỉ định mục cấu hình cần đặt lại'}), 400
             
-        return jsonify({'status': 'success', 'message': '设置已重置'})
+        return jsonify({'status': 'success', 'message': 'Đã đặt lại cài đặt'})
     except Exception as e:
         logger.error(f"重置设置失败: {str(e)}")
-        return jsonify({'status': 'error', 'message': '重置设置失败，请稍后重试'}), 500
+        return jsonify({'status': 'error', 'message': 'Đặt lại cài đặt thất bại, vui lòng thử lại sau'}), 500
 
 @app.route('/logs/cleanup', methods=['POST'])
 @login_required
@@ -3611,9 +3611,9 @@ def cleanup_logs_route():
     result = cleanup_logs(hours)
     
     if result.get('success'):
-        flash(f"日志清理成功，删除了{result['files_removed']}个文件，释放了{result['bytes_freed_readable']}空间", 'success')
+        flash(f"Dọn dẹp nhật ký thành công, đã xóa {result['files_removed']} tệp, giải phóng {result['bytes_freed_readable']} dung lượng", 'success')
     else:
-        flash(f"日志清理失败: {result.get('error', '未知错误')}", 'danger')
+        flash(f"Dọn dẹp nhật ký thất bại: {result.get('error', 'Lỗi không xác định')}", 'danger')
     
     return redirect(url_for('settings'))
 
@@ -3625,9 +3625,9 @@ def clear_logs_route():
     
     if result.get('success'):
         processed_files_str = "、".join(result['processed_files'])
-        flash(f"日志清理成功，已处理{result['files_processed']}个文件（{processed_files_str}），释放了{result['bytes_freed_readable']}空间", 'success')
+        flash(f"Dọn dẹp nhật ký thành công, đã xử lý {result['files_processed']} tệp ({processed_files_str}), giải phóng {result['bytes_freed_readable']} dung lượng", 'success')
     else:
-        flash(f"日志清理失败: {result.get('error', '未知错误')}", 'danger')
+        flash(f"Dọn dẹp nhật ký thất bại: {result.get('error', 'Lỗi không xác định')}", 'danger')
     
     return redirect(url_for('settings'))
 
@@ -3641,9 +3641,9 @@ def cleanup_downloads_route():
     result = cleanup_downloads(hours)
     
     if result.get('success'):
-        flash(f"下载内容清理成功，删除了{result['dirs_removed']}个目录、{result['files_removed']}个文件，释放了{result['bytes_freed_readable']}空间", 'success')
+        flash(f"Dọn dẹp nội dung tải xuống thành công, đã xóa {result['dirs_removed']} thư mục, {result['files_removed']} tệp, giải phóng {result['bytes_freed_readable']} dung lượng", 'success')
     else:
-        flash(f"下载内容清理失败: {result.get('error', '未知错误')}", 'danger')
+        flash(f"Dọn dẹp nội dung tải xuống thất bại: {result.get('error', 'Lỗi không xác định')}", 'danger')
     
     return redirect(url_for('settings'))
 
@@ -3945,15 +3945,15 @@ def youtube_monitor_config():
             
             # 验证必填项
             if not config_data['name']:
-                flash('配置名称不能为空', 'danger')
+                flash('Tên cấu hình không được để trống', 'danger')
                 return render_template('youtube_monitor_config.html')
             
             config_id = youtube_monitor.create_monitor_config(config_data)
-            flash(f'监控配置 "{config_data["name"]}" 创建成功！', 'success')
+            flash(f'Đã tạo cấu hình giám sát "{config_data["name"]}" thành công!', 'success')
             return redirect(url_for('youtube_monitor_index'))
             
         except Exception as e:
-            flash(f'创建监控配置失败: {str(e)}', 'danger')
+            flash(f'Tạo cấu hình giám sát thất bại: {str(e)}', 'danger')
     
     return render_template('youtube_monitor_config.html')
 
@@ -3963,7 +3963,7 @@ def youtube_monitor_config_edit(config_id):
     """编辑监控配置"""
     config = youtube_monitor.get_monitor_config(config_id)
     if not config:
-        flash('监控配置不存在', 'danger')
+        flash('Cấu hình giám sát không tồn tại', 'danger')
         return redirect(url_for('youtube_monitor_index'))
     
     if request.method == 'POST':
@@ -4017,15 +4017,15 @@ def youtube_monitor_config_edit(config_id):
             
             # 验证必填项
             if not config_data['name']:
-                flash('配置名称不能为空', 'danger')
+                flash('Tên cấu hình không được để trống', 'danger')
                 return render_template('youtube_monitor_config.html', config=config, is_edit=True)
             
             youtube_monitor.update_monitor_config(config_id, config_data)
-            flash(f'监控配置更新成功！', 'success')
+            flash('Đã cập nhật cấu hình giám sát thành công!', 'success')
             return redirect(url_for('youtube_monitor_index'))
             
         except Exception as e:
-            flash(f'更新监控配置失败: {str(e)}', 'danger')
+            flash(f'Cập nhật cấu hình giám sát thất bại: {str(e)}', 'danger')
     
     return render_template('youtube_monitor_config.html', config=config, is_edit=True)
 
@@ -4037,11 +4037,11 @@ def youtube_monitor_config_delete(config_id):
         config = youtube_monitor.get_monitor_config(config_id)
         if config:
             youtube_monitor.delete_monitor_config(config_id)
-            flash(f'监控配置 "{config["name"]}" 删除成功！', 'success')
+            flash(f'Đã xóa cấu hình giám sát "{config["name"]}" thành công!', 'success')
         else:
-            flash('监控配置不存在', 'danger')
+            flash('Cấu hình giám sát không tồn tại', 'danger')
     except Exception as e:
-        flash(f'删除监控配置失败: {str(e)}', 'danger')
+        flash(f'Xóa cấu hình giám sát thất bại: {str(e)}', 'danger')
     
     return redirect(url_for('youtube_monitor_index'))
 
@@ -4057,13 +4057,13 @@ def youtube_monitor_run(config_id):
         return redirect(url_for('youtube_monitor_index'))
 
     if not config:
-        fallback_message = '监控配置不存在'
+        fallback_message = 'Cấu hình giám sát không tồn tại'
         if _is_ajax_request():
             return jsonify({'success': False, 'message': fallback_message}), 404
         flash(fallback_message, 'danger')
         return redirect(url_for('youtube_monitor_index'))
 
-    started_message = f"监控已在后台开始执行：{config['name']}"
+    started_message = f"Giám sát đã bắt đầu chạy trong nền: {config['name']}"
     if _is_ajax_request():
         return jsonify({
             'success': True,
@@ -4072,7 +4072,7 @@ def youtube_monitor_run(config_id):
             'config_id': config_id,
         })
 
-    flash(f'{started_message}，请稍后刷新查看结果。', 'info')
+    flash(f'{started_message}, vui lòng làm mới sau để xem kết quả.', 'info')
     return redirect(url_for('youtube_monitor_history', config_id=config_id))
 
 
@@ -4108,7 +4108,7 @@ def youtube_monitor_history(config_id):
     """查看指定监控配置的发现历史"""
     config = youtube_monitor.get_monitor_config(config_id)
     if not config:
-        flash('监控配置不存在', 'danger')
+        flash('Cấu hình giám sát không tồn tại', 'danger')
         return redirect(url_for('youtube_monitor_index'))
     
     history = youtube_monitor.get_monitor_history(config_id, limit=200)
@@ -4144,11 +4144,11 @@ def youtube_monitor_add_to_tasks():
     video_id = data.get('video_id')
     config_id = data.get('config_id')
     if not video_id or not config_id:
-        return jsonify({'success': False, 'message': '参数不完整'}), 400
+        return jsonify({'success': False, 'message': 'Tham số chưa đầy đủ'}), 400
     try:
         config_id_int = int(config_id)
     except (TypeError, ValueError):
-        return jsonify({'success': False, 'message': 'config_id 无效'}), 400
+        return jsonify({'success': False, 'message': 'config_id không hợp lệ'}), 400
 
     success, message = youtube_monitor.add_video_to_tasks_manually(video_id, config_id_int)
 
@@ -4197,7 +4197,7 @@ def sync_cookies():
     """
     try:
         if not request.is_json:
-            return jsonify({'error': '请求必须是JSON格式'}), 400
+            return jsonify({'error': 'Yêu cầu phải có định dạng JSON'}), 400
         
         data = request.get_json()
         
@@ -4205,16 +4205,16 @@ def sync_cookies():
         required_fields = ['source', 'timestamp', 'cookies', 'cookieCount']
         for field in required_fields:
             if field not in data:
-                return jsonify({'error': f'缺少必要字段: {field}'}), 400
+                return jsonify({'error': f'Thiếu trường bắt buộc: {field}'}), 400
         
         # 验证来源
         if data['source'] not in ['userscript', 'extension']:
-            return jsonify({'error': '不支持的cookie来源'}), 400
+            return jsonify({'error': 'Nguồn cookie không được hỗ trợ'}), 400
         
         # 验证cookie数据
         cookies_content = data['cookies']
         if not cookies_content or not isinstance(cookies_content, str):
-            return jsonify({'error': 'cookie数据无效'}), 400
+            return jsonify({'error': 'Dữ liệu cookie không hợp lệ'}), 400
         
         # 保存cookie到文件
         cookies_dir = get_app_subdir('cookies')
@@ -4242,17 +4242,17 @@ def sync_cookies():
 
             return jsonify({
                 'success': True,
-                'message': 'Cookie同步成功',
+                'message': 'Đồng bộ Cookie thành công',
                 'sync_info': sync_info
             }), 200
             
         except Exception as e:
             logger.error(f"写入cookie文件失败: {str(e)}")
-            return jsonify({'error': '保存cookie失败，请稍后重试'}), 500
+            return jsonify({'error': 'Lưu cookie thất bại, vui lòng thử lại sau'}), 500
 
     except Exception as e:
         logger.error(f"Cookie同步API异常: {str(e)}")
-        return jsonify({'error': '服务器内部错误，请稍后重试'}), 500
+        return jsonify({'error': 'Lỗi nội bộ máy chủ, vui lòng thử lại sau'}), 500
 
 @app.route('/api/cookies/status', methods=['GET'])
 @login_required
@@ -4288,7 +4288,7 @@ def get_cookie_status():
         
     except Exception as e:
         logger.error(f"获取cookie状态失败: {str(e)}")
-        return jsonify({'error': '获取状态失败，请稍后重试'}), 500
+        return jsonify({'error': 'Lấy trạng thái thất bại, vui lòng thử lại sau'}), 500
 
 @app.route('/api/cookies/refresh-needed', methods=['POST'])
 @login_required
@@ -4310,13 +4310,13 @@ def cookie_refresh_needed():
         
         return jsonify({
             'success': True,
-            'message': 'Cookie刷新需求已记录',
-            'suggestion': '请使用浏览器扩展重新同步Cookie'
+            'message': 'Đã ghi nhận yêu cầu làm mới Cookie',
+            'suggestion': 'Vui lòng dùng tiện ích trình duyệt để đồng bộ lại Cookie'
         }), 200
         
     except Exception as e:
         logger.error(f"处理Cookie刷新需求失败: {str(e)}")
-        return jsonify({'error': '处理失败，请稍后重试'}), 500
+        return jsonify({'error': 'Xử lý thất bại, vui lòng thử lại sau'}), 500
 
 if __name__ == '__main__':
     logger.info("Y2A-Auto 启动中...")

@@ -1,4 +1,4 @@
-{% set display_title = task.video_title_translated or task.video_title_original or '未获取标题' %}
+{% set display_title = task.video_title_translated or task.video_title_original or 'Chưa lấy được tiêu đề' %}
 {% set qc_threshold = config.get('SUBTITLE_QC_THRESHOLD', 0.35)|float %}
 {% set qc_score = task.subtitle_qc_score %}
 {% set qc_score_value = qc_score|float if qc_score is not none and qc_score != '' else none %}
@@ -7,39 +7,39 @@
 {% set qc_reason_prefix = qc_reason_parts[0] if qc_reason_parts|length > 1 else '' %}
 {% set qc_reason_token = qc_reason_parts[1] if qc_reason_parts|length > 1 else qc_reason_raw %}
 {% if qc_reason_prefix == 'ai_fail' %}
-    {% set qc_reason_prefix_zh = 'AI复核未通过' %}
+    {% set qc_reason_prefix_zh = 'AI kiểm tra lại không đạt' %}
 {% elif qc_reason_prefix == 'ai_pass' %}
-    {% set qc_reason_prefix_zh = 'AI复核通过' %}
+    {% set qc_reason_prefix_zh = 'AI kiểm tra lại đạt' %}
 {% elif qc_reason_prefix == 'ai_warn' %}
-    {% set qc_reason_prefix_zh = 'AI提示但规则放行' %}
+    {% set qc_reason_prefix_zh = 'AI cảnh báo nhưng quy tắc cho qua' %}
 {% elif qc_reason_prefix == 'rule_fail' %}
-    {% set qc_reason_prefix_zh = '规则拦截失败' %}
+    {% set qc_reason_prefix_zh = 'Quy tắc chặn: thất bại' %}
 {% elif qc_reason_prefix == 'rule_pass' %}
-    {% set qc_reason_prefix_zh = '规则直接通过' %}
+    {% set qc_reason_prefix_zh = 'Quy tắc cho qua trực tiếp' %}
 {% elif qc_reason_prefix == 'qc_skipped' %}
-    {% set qc_reason_prefix_zh = 'AI不可用，按规则结果处理' %}
+    {% set qc_reason_prefix_zh = 'AI không dùng được, xử lý theo kết quả quy tắc' %}
 {% else %}
     {% set qc_reason_prefix_zh = '' %}
 {% endif %}
 {% if qc_reason_token == 'hallucination_meta' %}
-    {% set qc_reason_token_zh = '疑似幻觉/元信息污染' %}
+    {% set qc_reason_token_zh = 'Nghi ảo giác/nhiễm thông tin meta' %}
 {% elif qc_reason_token == 'healthy_dialogue' %}
-    {% set qc_reason_token_zh = '内容正常' %}
+    {% set qc_reason_token_zh = 'Nội dung bình thường' %}
 {% elif qc_reason_token == 'borderline_repeat' %}
-    {% set qc_reason_token_zh = '疑似重复模板' %}
+    {% set qc_reason_token_zh = 'Nghi lặp mẫu' %}
 {% elif qc_reason_token == 'ultra_short_repeat' %}
-    {% set qc_reason_token_zh = '超短字幕重复' %}
+    {% set qc_reason_token_zh = 'Phụ đề siêu ngắn bị lặp' %}
 {% elif qc_reason_token == 'ultra_short_low_info' %}
-    {% set qc_reason_token_zh = '超短字幕信息量过低' %}
+    {% set qc_reason_token_zh = 'Phụ đề siêu ngắn quá ít thông tin' %}
 {% elif qc_reason_token == 'provider_disabled' %}
-    {% set qc_reason_token_zh = '未启用AI复核提供商' %}
+    {% set qc_reason_token_zh = 'Chưa bật nhà cung cấp AI kiểm tra lại' %}
 {% elif qc_reason_token == 'empty_sample' %}
-    {% set qc_reason_token_zh = '抽样为空' %}
+    {% set qc_reason_token_zh = 'Mẫu lấy ra rỗng' %}
 {% elif qc_reason_token == 'asr_no_subtitle' %}
-    {% set qc_reason_token_zh = '语音识别未能生成字幕，已跳过字幕流程' %}
+    {% set qc_reason_token_zh = 'Nhận dạng giọng nói không tạo được phụ đề, đã bỏ qua quy trình phụ đề' %}
 {% elif qc_reason_token.startswith('ai_error') %}
-    {% set qc_reason_token_zh = 'AI调用异常' %}
-{% elif qc_reason_token == '字幕质检失败' %}
+    {% set qc_reason_token_zh = 'Lỗi gọi AI' %}
+{% elif qc_reason_token == '字幕质检Thất bại' %}
     {% set qc_reason_token_zh = qc_reason_token %}
 {% else %}
     {% set qc_reason_token_zh = qc_reason_token %}
@@ -50,11 +50,11 @@
     {% set qc_reason = qc_reason_token_zh %}
 {% endif %}
 {% if qc_score_value is not none %}
-    {% set qc_tooltip = '原因: ' ~ qc_reason ~ ' | 分数: ' ~ ('%.3f'|format(qc_score_value)) ~ ' | 阈值: ' ~ ('%.3f'|format(qc_threshold)) %}
+    {% set qc_tooltip = 'Nguyên nhân: ' ~ qc_reason ~ ' | Điểm: ' ~ ('%.3f'|format(qc_score_value)) ~ ' | Ngưỡng: ' ~ ('%.3f'|format(qc_threshold)) %}
 {% elif qc_reason_token == 'asr_no_subtitle' %}
-    {% set qc_tooltip = '原因: ' ~ qc_reason %}
+    {% set qc_tooltip = 'Nguyên nhân: ' ~ qc_reason %}
 {% else %}
-    {% set qc_tooltip = '原因: ' ~ qc_reason ~ ' | 阈值: ' ~ ('%.3f'|format(qc_threshold)) %}
+    {% set qc_tooltip = 'Nguyên nhân: ' ~ qc_reason ~ ' | Ngưỡng: ' ~ ('%.3f'|format(qc_threshold)) %}
 {% endif %}
 {% set show_progress = (task.status in ['uploading', 'downloading', 'translating_subtitle', 'encoding_video', 'asr_transcribing']) and task.upload_progress %}
 {% set target = (task.upload_target or 'acfun')|lower %}
@@ -76,13 +76,13 @@
             <div class="flex-grow-1">
                 <div class="task-title text-body fw-semibold title-clamp title-clamp-3" title="{{ display_title }}">{{ display_title }}</div>
                 {% if task.video_title_translated and task.video_title_original %}
-                    <div class="small text-muted text-truncate mt-1" title="原标题: {{ task.video_title_original }}">原标题: {{ task.video_title_original }}</div>
+                    <div class="small text-muted text-truncate mt-1" title="Tiêu đề gốc: {{ task.video_title_original }}">Tiêu đề gốc: {{ task.video_title_original }}</div>
                 {% endif %}
             </div>
             <div class="text-end flex-shrink-0">
                 <div class="id-cell d-flex align-items-center justify-content-end">
                     <span class="text-monospace small" title="{{ task.id }}">{{ task.id[:6] }}...</span>
-                    <button type="button" class="btn btn-link p-0 ms-1 copy-id-btn" title="复制ID" data-full-id="{{ task.id }}">
+                    <button type="button" class="btn btn-link p-0 ms-1 copy-id-btn" title="Sao chép ID" data-full-id="{{ task.id }}">
                         <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
@@ -94,50 +94,50 @@
                     {% if task.asr_warning_message %}
                         {% set asr_w = task.asr_warning_message|trim %}
                         {% if asr_w == 'vad_low_coverage' %}
-                            {% set asr_w_tip = 'VAD检测语音占比过低，字幕时间轴可能不准确' %}
+                            {% set asr_w_tip = 'VAD phát hiện tỉ lệ giọng nói quá thấp, trục thời gian phụ đề có thể không chính xác' %}
                         {% elif asr_w == 'asr_no_timestamps' %}
-                            {% set asr_w_tip = 'ASR返回结果中缺少时间戳，已尝试自动对齐' %}
+                            {% set asr_w_tip = 'Kết quả ASR trả về thiếu timestamp, đã thử căn chỉnh tự động' %}
                         {% elif asr_w == 'missing silero-vad or torch dependency' %}
-                            {% set asr_w_tip = '运行环境缺少 silero-vad / torch 依赖，VAD 已跳过并回退到固定分片识别' %}
+                            {% set asr_w_tip = 'Môi trường chạy thiếu phụ thuộc silero-vad / torch, VAD đã bỏ qua và quay về nhận dạng theo đoạn cố định' %}
                         {% elif asr_w == 'vad_no_speech' %}
-                            {% set asr_w_tip = 'VAD未在音频中检测到语音活动' %}
+                            {% set asr_w_tip = 'VAD không phát hiện hoạt động giọng nói trong audio' %}
                         {% elif asr_w == 'vad_no_usable_window' %}
-                            {% set asr_w_tip = 'VAD分割的语音片段均不可用' %}
+                            {% set asr_w_tip = 'Các đoạn giọng nói VAD đã cắt đều không dùng được' %}
                         {% elif asr_w.startswith('vad_failed') %}
-                            {% set asr_w_tip = 'VAD语音检测处理失败：' ~ asr_w %}
+                            {% set asr_w_tip = 'Xử lý phát hiện giọng nói VAD thất bại: ' ~ asr_w %}
                         {% elif asr_w == 'asr_failed' %}
-                            {% set asr_w_tip = 'ASR语音识别全部失败' %}
+                            {% set asr_w_tip = 'Nhận dạng giọng nói ASR thất bại toàn bộ' %}
                         {% else %}
-                            {% set asr_w_tip = 'ASR/VAD警告: ' ~ asr_w %}
+                            {% set asr_w_tip = 'Cảnh báo ASR/VAD: ' ~ asr_w %}
                         {% endif %}
                     {% endif %}
                     <div class="mt-1">
                         {% if task.subtitle_qc_failed and task.asr_warning_message %}
-                            <span class="badge bg-warning text-dark" title="{{ qc_tooltip }} | {{ asr_w_tip }}" data-bs-toggle="tooltip" data-bs-placement="top">字幕异常</span>
+                            <span class="badge bg-warning text-dark" title="{{ qc_tooltip }} | {{ asr_w_tip }}" data-bs-toggle="tooltip" data-bs-placement="top">Phụ đề bất thường</span>
                         {% elif task.subtitle_qc_failed %}
-                            <span class="badge bg-warning text-dark" title="{{ qc_tooltip }}" data-bs-toggle="tooltip" data-bs-placement="top">字幕异常</span>
+                            <span class="badge bg-warning text-dark" title="{{ qc_tooltip }}" data-bs-toggle="tooltip" data-bs-placement="top">Phụ đề bất thường</span>
                         {% else %}
-                            <span class="badge bg-warning text-dark" title="{{ asr_w_tip }}" data-bs-toggle="tooltip" data-bs-placement="top">字幕异常</span>
+                            <span class="badge bg-warning text-dark" title="{{ asr_w_tip }}" data-bs-toggle="tooltip" data-bs-placement="top">Phụ đề bất thường</span>
                         {% endif %}
                     </div>
                 {% endif %}
                 {% if task.subtitle_warning_message %}
                     {% set subtitle_w = task.subtitle_warning_message|trim %}
                     {% if subtitle_w == 'subtitle_embed_failed' %}
-                        {% set subtitle_w_tip = '字幕烧录失败，已保留字幕文件并继续上传原视频' %}
+                        {% set subtitle_w_tip = 'Ghi phụ đề thất bại, đã giữ file phụ đề và tiếp tục tải lên video gốc' %}
                     {% elif subtitle_w == 'asr_failed_block_embed' %}
-                        {% set subtitle_w_tip = 'ASR/VAD 质量结局为 failed（来源不可信），已拒绝烧录字幕并继续上传原视频' %}
+                        {% set subtitle_w_tip = 'Kết quả chất lượng ASR/VAD là failed (nguồn không đáng tin), đã từ chối ghi phụ đề và tiếp tục tải lên video gốc' %}
                     {% elif subtitle_w == 'asr_degraded_block_embed' %}
-                        {% set subtitle_w_tip = 'ASR/VAD 质量结局为 degraded 且未通过严格质检，已拒绝烧录字幕' %}
+                        {% set subtitle_w_tip = 'Kết quả chất lượng ASR/VAD là degraded và không qua kiểm tra chất lượng nghiêm ngặt, đã từ chối ghi phụ đề' %}
                     {% elif subtitle_w == 'subtitle_qc_rejected' %}
-                        {% set subtitle_w_tip = '字幕质检未通过，已拒绝烧录并保留字幕文件供人工检查' %}
+                        {% set subtitle_w_tip = 'Kiểm tra chất lượng phụ đề không đạt, đã từ chối ghi và giữ file phụ đề để kiểm tra thủ công' %}
                     {% elif subtitle_w == 'qc_unavailable' %}
-                        {% set subtitle_w_tip = '字幕质检未执行（文件缺失或执行异常），已按拒绝处理，可关闭字幕质检开关放行' %}
+                        {% set subtitle_w_tip = 'Kiểm tra chất lượng phụ đề chưa chạy (thiếu file hoặc lỗi thực thi), đã xử lý như từ chối, có thể tắt công tắc kiểm tra chất lượng phụ đề để cho qua' %}
                     {% else %}
-                        {% set subtitle_w_tip = '字幕处理警告: ' ~ subtitle_w %}
+                        {% set subtitle_w_tip = 'Cảnh báo xử lý phụ đề: ' ~ subtitle_w %}
                     {% endif %}
                     <div class="mt-1">
-                        <span class="badge bg-warning text-dark" title="{{ subtitle_w_tip }}" data-bs-toggle="tooltip" data-bs-placement="top">字幕烧录异常</span>
+                        <span class="badge bg-warning text-dark" title="{{ subtitle_w_tip }}" data-bs-toggle="tooltip" data-bs-placement="top">Lỗi ghi phụ đề</span>
                     </div>
                 {% endif %}
             </div>
@@ -150,7 +150,7 @@
                 {% if target == 'bilibili' %}
                     <span class="badge-platform badge-platform-bilibili"><i class="bi bi-play-btn-fill"></i>bilibili</span>
                 {% elif target == 'both' %}
-                    <span class="badge-platform badge-platform-both"><i class="bi bi-collection-play-fill"></i>双平台</span>
+                    <span class="badge-platform badge-platform-both"><i class="bi bi-collection-play-fill"></i>Cả hai nền tảng</span>
                 {% else %}
                     <span class="badge-platform badge-platform-acfun"><i class="bi bi-camera-video-fill"></i>AcFun</span>
                 {% endif %}
@@ -161,22 +161,22 @@
                 {% if target == 'both' %}
                     {% set ac_pid = task.selected_partition_id_acfun or task.recommended_partition_id_acfun %}
                     {% set bili_pid = task.selected_partition_id_bilibili or task.recommended_partition_id_bilibili %}
-                    {% if ac_pid %}AcFun: {{ get_partition_name(ac_pid, 'acfun') or ac_pid }}{% if (not task.selected_partition_id_acfun) and task.recommended_partition_id_acfun %}<span class="text-secondary ms-1">(荐)</span>{% endif %}{% endif %}
+                    {% if ac_pid %}AcFun: {{ get_partition_name(ac_pid, 'acfun') or ac_pid }}{% if (not task.selected_partition_id_acfun) and task.recommended_partition_id_acfun %}<span class="text-secondary ms-1">(Đề xuất)</span>{% endif %}{% endif %}
                     {% if ac_pid and bili_pid %} / {% endif %}
-                    {% if bili_pid %}bili: {{ get_partition_name(bili_pid, 'bilibili') or bili_pid }}{% if (not task.selected_partition_id_bilibili) and task.recommended_partition_id_bilibili %}<span class="text-secondary ms-1">(荐)</span>{% endif %}{% endif %}
+                    {% if bili_pid %}bili: {{ get_partition_name(bili_pid, 'bilibili') or bili_pid }}{% if (not task.selected_partition_id_bilibili) and task.recommended_partition_id_bilibili %}<span class="text-secondary ms-1">(Đề xuất)</span>{% endif %}{% endif %}
                 {% elif target == 'bilibili' %}
                     {% set bili_pid = task.selected_partition_id_bilibili or task.recommended_partition_id_bilibili or task.selected_partition_id or task.recommended_partition_id %}
                     {% if bili_pid %}
                         {{ get_partition_name(bili_pid, 'bilibili') or bili_pid }}
                     {% else %}
-                        未设置
+                        Chưa đặt
                     {% endif %}
                 {% else %}
                     {% set ac_pid = task.selected_partition_id_acfun or task.recommended_partition_id_acfun or task.selected_partition_id or task.recommended_partition_id %}
                     {% if ac_pid %}
                         {{ get_partition_name(ac_pid, 'acfun') or ac_pid }}
                     {% else %}
-                        未设置
+                        Chưa đặt
                     {% endif %}
                 {% endif %}
             </div>
@@ -194,7 +194,7 @@
                     {% endif %}
                 </div>
             {% else %}
-                <span class="badge bg-secondary">未生成标签</span>
+                <span class="badge bg-secondary">Chưa tạo thẻ tag</span>
             {% endif %}
         </div>
 
@@ -204,25 +204,25 @@
                 {% set bili_result = parse_json(task.bilibili_upload_response) if task.bilibili_upload_response else {} %}
                 {% if bili_result and bili_result.bvid %}
                     <a href="{{ bili_result.url or ('https://www.bilibili.com/video/' ~ bili_result.bvid) }}" target="_blank" rel="noopener" class="badge bg-success text-decoration-none">{{ bili_result.bvid }}</a>
-                    {% set submit_badge = submit_api_badge(bili_result.submit_api) %}{% if submit_badge %}<span class="badge bg-light text-dark border ms-1" title="投稿接口">{{ submit_badge }}</span>{% endif %}
+                    {% set submit_badge = submit_api_badge(bili_result.submit_api) %}{% if submit_badge %}<span class="badge bg-light text-dark border ms-1" title="API đăng tải">{{ submit_badge }}</span>{% endif %}
                 {% elif task.status == 'failed' and task.error_message %}
                     {% if ac_result and ac_result.ac_number %}
                     <button type="button"
                             class="badge bg-warning text-dark error-message-badge error-message-trigger border-0"
-                            title="点击查看B站上传错误详情"
-                            data-error-message="[B站] {{ task.error_message }}"
+                            title="Bấm để xem chi tiết lỗi tải lên bilibili"
+                            data-error-message="[bilibili] {{ task.error_message }}"
                             data-task-title="{{ display_title }}"
-                            data-task-id="{{ task.id }}">B站上传错误</button>
+                            data-task-id="{{ task.id }}">Lỗi tải lên bilibili</button>
                     {% else %}
                     <button type="button"
                             class="badge bg-danger error-message-badge error-message-trigger border-0"
-                            title="点击查看B站上传失败详情"
-                            data-error-message="[B站] {{ task.error_message }}"
+                            title="Bấm để xem chi tiết tải lên bilibili thất bại"
+                            data-error-message="[bilibili] {{ task.error_message }}"
                             data-task-title="{{ display_title }}"
-                            data-task-id="{{ task.id }}">B站上传失败</button>
+                            data-task-id="{{ task.id }}">Tải lên bilibili thất bại</button>
                     {% endif %}
                 {% else %}
-                    <span class="badge bg-secondary">BV待上传</span>
+                    <span class="badge bg-secondary">BV chờ tải lên</span>
                 {% endif %}
                 {% if ac_result and ac_result.ac_number %}
                     <a href="https://www.acfun.cn/v/ac{{ ac_result.ac_number }}" target="_blank" rel="noopener" class="badge bg-success text-decoration-none">AC{{ ac_result.ac_number }}</a>
@@ -230,99 +230,99 @@
                     {% if bili_result and bili_result.bvid %}
                     <button type="button"
                             class="badge bg-warning text-dark error-message-badge error-message-trigger border-0"
-                            title="点击查看AcFun上传错误详情"
+                            title="Bấm để xem chi tiết lỗi tải lên AcFun"
                             data-error-message="[AcFun] {{ task.error_message }}"
                             data-task-title="{{ display_title }}"
-                            data-task-id="{{ task.id }}">AC上传错误</button>
+                            data-task-id="{{ task.id }}">Lỗi tải lên AcFun</button>
                     {% else %}
                     <button type="button"
                             class="badge bg-danger error-message-badge error-message-trigger border-0"
-                            title="点击查看AcFun上传失败详情"
+                            title="Bấm để xem chi tiết tải lên AcFun thất bại"
                             data-error-message="[AcFun] {{ task.error_message }}"
                             data-task-title="{{ display_title }}"
-                            data-task-id="{{ task.id }}">AC上传失败</button>
+                            data-task-id="{{ task.id }}">Tải lên AcFun thất bại</button>
                     {% endif %}
                 {% else %}
-                    <span class="badge bg-secondary">AC待上传</span>
+                    <span class="badge bg-secondary">AC chờ tải lên</span>
                 {% endif %}
             {% elif task.status == 'completed' and target == 'bilibili' and task.bilibili_upload_response %}
                 {% set upload_result = parse_json(task.bilibili_upload_response) %}
                 {% if upload_result and upload_result.bvid %}
                     <a href="{{ upload_result.url or ('https://www.bilibili.com/video/' ~ upload_result.bvid) }}" target="_blank" rel="noopener" class="badge bg-success text-decoration-none">{{ upload_result.bvid }}</a>
-                    {% set submit_badge = submit_api_badge(upload_result.submit_api) %}{% if submit_badge %}<span class="badge bg-light text-dark border ms-1" title="投稿接口">{{ submit_badge }}</span>{% endif %}
-                    <button type="button" class="btn btn-sm btn-outline-success ms-1 copy-bv-btn" title="复制BV号" data-bv-number="{{ upload_result.bvid }}">
+                    {% set submit_badge = submit_api_badge(upload_result.submit_api) %}{% if submit_badge %}<span class="badge bg-light text-dark border ms-1" title="API đăng tải">{{ submit_badge }}</span>{% endif %}
+                    <button type="button" class="btn btn-sm btn-outline-success ms-1 copy-bv-btn" title="Sao chép số BV" data-bv-number="{{ upload_result.bvid }}">
                         <i class="bi bi-clipboard"></i>
                     </button>
                 {% else %}
-                    <span class="badge bg-secondary">未获取BV号</span>
+                    <span class="badge bg-secondary">Chưa lấy được số BV</span>
                 {% endif %}
             {% elif task.status == 'completed' and target != 'bilibili' and task.acfun_upload_response %}
                 {% set upload_result = parse_json(task.acfun_upload_response) %}
                 {% if upload_result and upload_result.ac_number %}
                     <a href="https://www.acfun.cn/v/ac{{ upload_result.ac_number }}" target="_blank" rel="noopener" class="badge bg-success text-decoration-none">AC{{ upload_result.ac_number }}</a>
-                    <button type="button" class="btn btn-sm btn-outline-success ms-1 copy-ac-btn" title="复制AC号" data-ac-number="{{ upload_result.ac_number }}">
+                    <button type="button" class="btn btn-sm btn-outline-success ms-1 copy-ac-btn" title="Sao chép số AC" data-ac-number="{{ upload_result.ac_number }}">
                         <i class="bi bi-clipboard"></i>
                     </button>
                 {% else %}
-                    <span class="badge bg-secondary">未获取AC号</span>
+                    <span class="badge bg-secondary">Chưa lấy được số AC</span>
                 {% endif %}
             {% elif task.status == 'ready_for_upload' and task.error_message %}
                 {% set error_msg = task.error_message %}
                 {% if error_msg|length > 24 %}
                     <button type="button"
                             class="badge bg-warning text-dark error-message-badge error-message-trigger border-0"
-                            title="点击查看完整错误信息"
+                            title="Bấm để xem đầy đủ thông báo lỗi"
                             data-error-message="{{ error_msg }}"
                             data-task-title="{{ display_title }}"
                             data-task-id="{{ task.id }}">{{ error_msg[:21] }}...</button>
                 {% else %}
                     <button type="button"
                             class="badge bg-warning text-dark error-message-badge error-message-trigger border-0"
-                            title="点击查看完整错误信息"
+                            title="Bấm để xem đầy đủ thông báo lỗi"
                             data-error-message="{{ error_msg }}"
                             data-task-title="{{ display_title }}"
                             data-task-id="{{ task.id }}">{{ error_msg }}</button>
                 {% endif %}
             {% elif task.status == 'failed' %}
-                {% set error_msg = task.error_message or '未知错误' %}
+                {% set error_msg = task.error_message or 'Lỗi không xác định' %}
                 {% if error_msg|length > 24 %}
                     <button type="button"
                             class="badge bg-danger error-message-badge error-message-trigger border-0"
-                            title="点击查看完整错误信息"
+                            title="Bấm để xem đầy đủ thông báo lỗi"
                             data-error-message="{{ error_msg }}"
                             data-task-title="{{ display_title }}"
                             data-task-id="{{ task.id }}">{{ error_msg[:21] }}...</button>
                 {% else %}
                     <button type="button"
                             class="badge bg-danger error-message-badge error-message-trigger border-0"
-                            title="点击查看完整错误信息"
+                            title="Bấm để xem đầy đủ thông báo lỗi"
                             data-error-message="{{ error_msg }}"
                             data-task-title="{{ display_title }}"
                             data-task-id="{{ task.id }}">{{ error_msg }}</button>
                 {% endif %}
             {% else %}
-                <span class="badge bg-secondary">未上传</span>
+                <span class="badge bg-secondary">Chưa tải lên</span>
             {% endif %}
         </div>
 
         <div class="task-actions mt-3 d-grid gap-2 task-actions-grid-2">
             {% if task.status == 'awaiting_manual_review' %}
-                <a href="{{ url_for('review_task', task_id=task.id) }}" class="btn btn-sm btn-warning"><i class="bi bi-eye me-1"></i> 审核</a>
+                <a href="{{ url_for('review_task', task_id=task.id) }}" class="btn btn-sm btn-warning"><i class="bi bi-eye me-1"></i> Kiểm duyệt</a>
             {% elif task.status == 'pending' or task.status == 'failed' %}
                 <form method="post" action="{{ url_for('start_task_route', task_id=task.id) }}" class="m-0 p-0 d-inline">
-                    <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-play-fill me-1"></i> 开始</button>
+                    <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-play-fill me-1"></i> trở đi</button>
                 </form>
             {% elif task.status == 'ready_for_upload' %}
                 <form method="post" action="{{ url_for('force_upload_task_route', task_id=task.id) }}" class="m-0 p-0 d-inline">
-                    <button type="submit" class="btn btn-sm btn-success w-100"><i class="bi bi-cloud-upload me-1"></i> 上传到{{ '双平台' if target == 'both' else ('bilibili' if target == 'bilibili' else 'AcFun') }}</button>
+                    <button type="submit" class="btn btn-sm btn-success w-100"><i class="bi bi-cloud-upload me-1"></i> Tải lên {{ 'Cả hai nền tảng' if target == 'both' else ('bilibili' if target == 'bilibili' else 'AcFun') }}</button>
                 </form>
             {% endif %}
-            <a href="{{ url_for('edit_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i> 编辑</a>
+            <a href="{{ url_for('edit_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i> Chỉnh sửa</a>
             <button type="button" class="btn btn-sm btn-outline-danger"
                 data-task-id="{{ task.id }}"
                 data-task-title="{{ display_title }}"
                 onclick="confirmDelete(this.dataset.taskId, this.dataset.taskTitle)">
-                <i class="bi bi-trash me-1"></i> 删除
+                <i class="bi bi-trash me-1"></i> Xóa
             </button>
         </div>
     </div>

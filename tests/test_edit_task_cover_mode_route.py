@@ -31,7 +31,7 @@ class EditTaskCoverModeRouteTests(unittest.TestCase):
                 'success': True,
                 'mode': mode,
                 'cover_processing_mode': mode,
-                'message': '封面处理模式已更新。',
+                'message': 'Đã cập nhật chế độ xử lý ảnh bìa.',
             })
             update_mock.assert_called_once_with({'COVER_PROCESSING_MODE': mode})
             configure_mock.assert_called_once_with(web_app.app, {'COVER_PROCESSING_MODE': mode})

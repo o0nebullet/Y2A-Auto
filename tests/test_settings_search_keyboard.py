@@ -26,7 +26,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 HARNESS = REPO_ROOT / 'tests' / 'js' / 'settings_search_keyboard.js'
 
 # 提取锚点：模板里的真实注释与定义，改动搜索脚本时这两处锚点应保持稳定。
-SEARCH_MARKER = '/* 设置项搜索：字段级索引 + 结果面板 + 定位高亮'
+SEARCH_MARKER = '/* Tìm kiếm mục cài đặt: chỉ mục cấp trường + bảng kết quả + làm nổi vị trí'
 HELPERS_START = 'const settingsEscapeSelector = function (value) {'
 HELPERS_LABEL = 'const settingsFieldLabel'
 DOM_READY = "document.addEventListener('DOMContentLoaded'"
@@ -119,7 +119,7 @@ class SettingsSearchKeyboardTests(unittest.TestCase):
         scenario = self.by_name['未按方向键时 Enter 跳第一条']
         self.assertEqual(scenario['renderedCount'], 3, '输入后应列出全部匹配项')
         self.assertEqual(scenario['expandedBeforeEnter'], 'true')
-        self.assertIn('按 Enter 跳转', scenario['hint'])
+        self.assertIn('bấm Enter để nhảy tới', scenario['hint'])
 
     def test_回车后结果面板收起(self):
         for name in ('未按方向键时 Enter 跳第一条', '下移两次后 Enter 跳第二项'):

@@ -231,7 +231,7 @@ class RetryMetadataTranslationTests(unittest.TestCase):
 
         self.assertIn('{% if task.can_retry_translation %}', template)
         self.assertIn('id="retryTranslationForm" method="post"', template)
-        self.assertIn('已手动修改的标题、简介、标签和分区选择将被清空并重新生成。', template)
+        self.assertIn('Tiêu đề, mô tả, thẻ tag và lựa chọn chuyên mục đã sửa tay sẽ bị xóa và tạo lại.', template)
         self.assertIn("@app.route('/tasks/<task_id>/retry_translation', methods=['POST'])", app_source)
         self.assertIn('if not is_metadata_translation_retryable(task):', app_source)
 

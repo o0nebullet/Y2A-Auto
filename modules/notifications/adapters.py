@@ -19,8 +19,8 @@ ALL_CHANNELS = (
 )
 
 CHANNEL_LABELS = {
-    CHANNEL_WECOM: "企业微信",
-    CHANNEL_SERVERCHAN: "Server酱",
+    CHANNEL_WECOM: "WeCom",
+    CHANNEL_SERVERCHAN: "ServerChan",
     CHANNEL_MESSAGE_PUSHER: "message-pusher",
 }
 
@@ -108,7 +108,7 @@ class WeComNotifier(Notifier):
             data = response.json()
             if int(data.get("errcode", -1)) == 0:
                 return
-            raise NotificationSendError(str(data.get("errmsg") or "企业微信 Markdown 推送失败"))
+            raise NotificationSendError(str(data.get("errmsg") or "Đẩy Markdown WeCom thất bại"))
         except NotificationSendError:
             raise
         except Exception as original_exc:
@@ -124,11 +124,11 @@ class WeComNotifier(Notifier):
                 self._raise_for_http_error(response)
                 data = response.json()
                 if int(data.get("errcode", -1)) != 0:
-                    raise NotificationSendError(str(data.get("errmsg") or "企业微信推送失败")) from original_exc
+                    raise NotificationSendError(str(data.get("errmsg") or "Đẩy WeCom thất bại")) from original_exc
             except NotificationSendError:
                 raise
             except Exception as fallback_exc:
-                raise NotificationSendError(f"企业微信推送失败(含回退): {fallback_exc}") from original_exc
+                raise NotificationSendError(f"Đẩy WeCom thất bại (đã thử dự phòng): {fallback_exc}") from original_exc
 
 
 class ServerChanNotifier(Notifier):
@@ -149,7 +149,7 @@ class ServerChanNotifier(Notifier):
         self._raise_for_http_error(response)
         data = response.json()
         if int(data.get("code", -1)) != 0:
-            raise NotificationSendError(str(data.get("message") or "Server酱推送失败"))
+            raise NotificationSendError(str(data.get("message") or "Đẩy ServerChan thất bại"))
 
 
 class MessagePusherNotifier(Notifier):
@@ -177,7 +177,7 @@ class MessagePusherNotifier(Notifier):
         self._raise_for_http_error(response)
         data = response.json()
         if not bool(data.get("success")):
-            raise NotificationSendError(str(data.get("message") or "message-pusher 推送失败"))
+            raise NotificationSendError(str(data.get("message") or "Đẩy message-pusher thất bại"))
 
 
 def build_notifier_registry() -> dict[str, Notifier]:
