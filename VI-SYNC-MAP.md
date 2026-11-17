@@ -6,7 +6,7 @@
 - Phạm vi dịch (theo mẫu các repo trước): giao diện + thông báo + README. Dịch hẳn sang tiếng Việt, không nút đổi ngôn ngữ. Không đổi logic, không đổi tên biến/hàm, không đổi tên field JSON/key dict.
 - "Số dòng Trung đã dịch" = số dòng chứa CJK ở commit gốc trừ số dòng chứa CJK còn lại (đếm bằng regex `[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\U00020000-\U0002A6DF]`).
 - Tổng phạm vi: 2.730 dòng Trung trong 18 file → còn 440 dòng → **đã dịch ròng 2.288 dòng** (`git diff c5ce9f6`: 2.305 dòng Trung xóa, 17 dòng Trung thêm — 17 dòng thêm đều là dòng sửa mà vẫn giữ chữ Trung có chủ đích, xem dưới).
-- Thuật ngữ thống nhất: 设置=cài đặt, 任务=nhiệm vụ, 视频=video, 字幕=phụ đề, 上传=tải lên, 下载=tải xuống, 监控=giám sát, 频道=kênh, 标题=tiêu đề, 封面=ảnh bìa, 分辨率=độ phân giải, 编码=mã hóa, 转码=chuyển mã, 审核=kiểm duyệt, 通知=thông báo, 失败=thất bại, 成功=thành công, 配置=cấu hình, 保存=lưu, 删除=xóa, 编辑=chỉnh sửa, 搜索=tìm kiếm, 开始=bắt đầu, 停止=dừng, 暂停=tạm dừng, 继续=tiếp tục, 重试=thử lại, 队列=hàng đợi, 日志=nhật ký, 状态=trạng thái, 详情=chi tiết, 预览=xem trước, 完成=hoàn thành, 确认=xác nhận, 取消=hủy, 警告=cảnh báo, 错误=lỗi, 提示=thông báo, 登录=đăng nhập, 退出=đăng xuất, 启用=bật, 禁用=tắt, 默认=mặc định, 高级=nâng cao, 版本=phiên bản, 刷新=làm mới, 复制=sao chép, 分区 (bilibili)=chuyên mục, 标签=thẻ tag, 简介=mô tả, 分P=phần, 投稿=đăng tải, 弹幕=danmaku (bình luận chạy), 自部署=tự triển khai, 公共实例=instance công khai. Giữ nguyên: YouTube, AcFun, bilibili, Telegram, Flask, FFmpeg, OpenAI, API, API Key, Cookie, URL, JSON, x264/x265, SRT, ASS, MP4, tên model, đường dẫn, tên lệnh. `企业微信`→WeCom, `Server酱`→ServerChan, `必剪`→BiCut, `阿里云`→Alibaba Cloud.
+- Thuật ngữ thống nhất: 设置=cài đặt, 任务=nhiệm vụ, 视频=video, 字幕=phụ đề, 上传=tải lên, 下载=tải xuống, 监控=giám sát, 频道=kênh, 标题=tiêu đề, 封面=ảnh bìa, 分辨率=độ phân giải, 编码=mã hóa, 转码=chuyển mã, 审核=kiểm duyệt, 通知=thông báo, 失败=thất bại, 成功=thành công, 配置=cấu hình, 保存=lưu, 删除=xóa, 编辑=chỉnh sửa, 搜索=tìm kiếm, 开始=bắt đầu, 停止=dừng, 暂停=tạm dừng, 继续=tiếp tục, 重试=thử lại, 队列=hàng đợi, 日志=nhật ký, 状态=trạng thái, 详情=chi tiết, 预览=xem trước, 完成=hoàn thành, 确认=xác nhận, 取消=hủy, 警告=cảnh báo, 错误=lỗi, 提示=thông báo, 登录=đăng nhập, 退出=đăng xuất, 启用=bật, 禁用=tắt, 默认=mặc định, 高级=nâng cao, 版本=phiên bản, 刷新=làm mới, 复制=sao chép, 分区 (bilibili)=chuyên mục, 标签=thẻ tag, 简介=mô tả, 分P=phần, 投稿=đăng tải, 弹幕=danmaku (bình luận chạy), 自部署=tự triển khai, 公共实例=instance công khai. Giữ nguyên: YouTube, AcFun, bilibili, Telegram, Flask, FFmpeg, OpenAI, API, API Key, Cookie, URL, JSON, x264/x265, SRT, ASS, MP4, tên model, đường dẫn, tên lệnh. `企业微信`→WeCom, `Server酱`→ServerChan, `必剪`→Bcut, `阿里云`→Alibaba Cloud.
 
 ## File đã dịch
 
@@ -55,7 +55,7 @@
 
 ## Chỗ mơ hồ cần AD quyết / kiểm lại khi review
 
-- `必剪` → `BiCut` (tên tiếng Anh chuẩn của app, chưa kiểm chứng trong repo này).
+- `必剪` → `Bcut` (tên tiếng Anh chính thức của app Bilibili (đã kiểm chứng 16/11)).
 - `署名行` (mục QC) → `dòng ghi tên tác giả` — có thể là dòng ghi công/chữ ký.
 - Đoạn `OPENAI_THINKING_ENABLED` trong README dài, logic vendor/endpoint phức tạp — đã dịch sát từng mệnh đề, nên đọc kỹ lại khi review.
 - `get_aliyun_label_chinese` (tên hàm) giữ nguyên vì là tên code; nhãn hiển thị đã dịch.

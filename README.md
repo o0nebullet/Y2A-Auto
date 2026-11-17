@@ -241,7 +241,7 @@ Lần chạy đầu tiên sẽ tự động tạo `config/config.json`. Nên c�
 - `YOUTUBE_COOKIES_PATH`: đường dẫn YouTube Cookie
 - `ACFUN_COOKIES_PATH`: đường dẫn AcFun Cookie
 - `BILIBILI_COOKIES_PATH`: đường dẫn bilibili Cookie
-- `BILIBILI_SUBMIT_API`: API đăng tải của bilibili, `auto` (mặc định, ưu tiên API PC của BiCut, nếu thất bại sẽ quay về Web) / `bcut_pc` / `web` (nếu sửa tay thành `bcut` hay các bí danh khác cũng sẽ được chuẩn hóa rồi mới lưu)
+- `BILIBILI_SUBMIT_API`: API đăng tải của bilibili, `auto` (mặc định, ưu tiên API PC của Bcut, nếu thất bại sẽ quay về Web) / `bcut_pc` / `web` (nếu sửa tay thành `bcut` hay các bí danh khác cũng sẽ được chuẩn hóa rồi mới lưu)
 - `YOUTUBE_PROXY_ENABLED` / `YOUTUBE_PROXY_URL`: proxy tải xuống YouTube
 - `YOUTUBE_API_PROXY_ENABLED` / `YOUTUBE_API_PROXY_URL`: proxy riêng cho API giám sát YouTube, không kế thừa proxy tải xuống
 - `YOUTUBE_DOWNLOAD_THREADS`: số luồng tải xuống
@@ -566,7 +566,7 @@ Sau khi kết nối được thiết lập, mở `http://localhost:5000` trong t
   - Kiểm tra xem thông tin meta trên trang kiểm duyệt thủ công có tuân thủ hay không
 - Tải lên bilibili thất bại
   - Cập nhật `cookies/bili_cookies.json`, hoặc dùng mã QR để đăng nhập lại trên trang cài đặt
-  - Lỗi 603 "Hệ thống phát hiện hành vi bất thường" là kiểm soát rủi ro ở cấp tài khoản: API đăng tải mặc định `auto` sẽ đi qua API PC của BiCut trước, nếu thất bại sẽ quay về Web; khi cả hai kênh đều bị chặn, hãy đăng nhập cùng tài khoản bằng trình duyệt và đăng tải thủ công một lần trong Trung tâm sáng tạo, hoặc hoàn tất xác minh tên thật / khiếu nại với bộ phận chăm sóc khách hàng theo hướng dẫn, đồng thời giữ IP đầu ra ổn định và giảm tần suất đăng tải
+  - Lỗi 603 "Hệ thống phát hiện hành vi bất thường" là kiểm soát rủi ro ở cấp tài khoản: API đăng tải mặc định `auto` sẽ đi qua API PC của Bcut trước, nếu thất bại sẽ quay về Web; khi cả hai kênh đều bị chặn, hãy đăng nhập cùng tài khoản bằng trình duyệt và đăng tải thủ công một lần trong Trung tâm sáng tạo, hoặc hoàn tất xác minh tên thật / khiếu nại với bộ phận chăm sóc khách hàng theo hướng dẫn, đồng thời giữ IP đầu ra ổn định và giảm tần suất đăng tải
 - Dịch phụ đề chậm
   - Điều chỉnh số lượng đồng thời và kích thước lô, đồng thời chú ý giới hạn tốc độ của API
 - Docker chưa bật NVENC

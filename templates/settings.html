@@ -410,11 +410,11 @@
                                                 <div class="form-group">
                                                     <label for="bilibili-submit-api" class="form-label">API đăng tải</label>
                                                     <select id="bilibili-submit-api" name="BILIBILI_SUBMIT_API" class="form-control">
-                                                        <option value="auto" {% if config.get('BILIBILI_SUBMIT_API', 'auto') == 'auto' %}selected{% endif %}>Tự động (ưu tiên BiCut, thất bại chuyển sang Web)</option>
-                                                        <option value="bcut_pc" {% if config.get('BILIBILI_SUBMIT_API') == 'bcut_pc' %}selected{% endif %}>Chỉ dùng API PC BiCut</option>
+                                                        <option value="auto" {% if config.get('BILIBILI_SUBMIT_API', 'auto') == 'auto' %}selected{% endif %}>Tự động (ưu tiên Bcut, thất bại chuyển sang Web)</option>
+                                                        <option value="bcut_pc" {% if config.get('BILIBILI_SUBMIT_API') == 'bcut_pc' %}selected{% endif %}>Chỉ dùng API PC Bcut</option>
                                                         <option value="web" {% if config.get('BILIBILI_SUBMIT_API') == 'web' %}selected{% endif %}>Chỉ dùng API đăng tải Web</option>
                                                     </select>
-                                                    <p class="help-text">Mặc định dùng API đăng tải PC BiCut trước (kiểm soát rủi ro độc lập với đăng tải Web), thất bại sẽ tự quay về Web.</p>
+                                                    <p class="help-text">Mặc định dùng API đăng tải PC Bcut trước (kiểm soát rủi ro độc lập với đăng tải Web), thất bại sẽ tự quay về Web.</p>
                                                 </div>
                                                 <div class="settings-inline-actions">
                                                     <button type="button" class="btn btn-outline-primary" id="bili-qrcode-start-btn">
